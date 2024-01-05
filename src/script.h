@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_SCRIPT_H
-#define FRIDANODE_SCRIPT_H
+#ifndef TELCONODE_SCRIPT_H
+#define TELCONODE_SCRIPT_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Script : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class Script : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  explicit Script(FridaScript* handle, Runtime* runtime);
+  explicit Script(TelcoScript* handle, Runtime* runtime);
   ~Script();
 
   static NAN_METHOD(New);

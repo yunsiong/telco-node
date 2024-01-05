@@ -26,21 +26,21 @@ using v8::String;
 using v8::Uint32;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-static FridaScriptOptions* ParseScriptOptions(Local<Value> name_value,
+static TelcoScriptOptions* ParseScriptOptions(Local<Value> name_value,
     Local<Value> snapshot_value, Local<Value> runtime_value);
-static FridaSnapshotOptions* ParseSnapshotOptions(
+static TelcoSnapshotOptions* ParseSnapshotOptions(
     Local<Value> warmup_script_value, Local<Value> runtime_value);
 static void UnrefGBytes(char* data, void* hint);
 
-Session::Session(FridaSession* handle, Runtime* runtime)
+Session::Session(TelcoSession* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
 
 Session::~Session() {
-  frida_unref(handle_);
+  telco_unref(handle_);
 }
 
 void Session::Init(Local<Object> exports, Runtime* runtime) {
@@ -97,7 +97,7 @@ NAN_METHOD(Session::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaSession*>(
+  auto handle = static_cast<TelcoSession*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new Session(handle, runtime);
   auto obj = info.This();
@@ -110,38 +110,38 @@ NAN_METHOD(Session::New) {
 
 NAN_PROPERTY_GETTER(Session::GetPid) {
   auto handle = ObjectWrap::Unwrap<Session>(
-      info.Holder())->GetHandle<FridaSession>();
+      info.Holder())->GetHandle<TelcoSession>();
 
   info.GetReturnValue().Set(Nan::New<Uint32>(
-      frida_session_get_pid(handle)));
+      telco_session_get_pid(handle)));
 }
 
 NAN_PROPERTY_GETTER(Session::GetPersistTimeout) {
   auto handle = ObjectWrap::Unwrap<Session>(
-      info.Holder())->GetHandle<FridaSession>();
+      info.Holder())->GetHandle<TelcoSession>();
 
   info.GetReturnValue().Set(Nan::New<Uint32>(
-      frida_session_get_persist_timeout(handle)));
+      telco_session_get_persist_timeout(handle)));
 }
 
 NAN_PROPERTY_GETTER(Session::IsDetached) {
   auto handle = ObjectWrap::Unwrap<Session>(
-      info.Holder())->GetHandle<FridaSession>();
+      info.Holder())->GetHandle<TelcoSession>();
 
   info.GetReturnValue().Set(
-      Nan::New(static_cast<bool>(frida_session_is_detached(handle))));
+      Nan::New(static_cast<bool>(telco_session_is_detached(handle))));
 }
 
 namespace {
 
-class DetachOperation : public Operation<FridaSession> {
+class DetachOperation : public Operation<TelcoSession> {
  protected:
   void Begin() {
-    frida_session_detach(handle_, cancellable_, OnReady, this);
+    telco_session_detach(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_session_detach_finish(handle_, result, error);
+    telco_session_detach_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -163,14 +163,14 @@ NAN_METHOD(Session::Detach) {
 
 namespace {
 
-class ResumeOperation : public Operation<FridaSession> {
+class ResumeOperation : public Operation<TelcoSession> {
  protected:
   void Begin() {
-    frida_session_resume(handle_, cancellable_, OnReady, this);
+    telco_session_resume(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_session_resume_finish(handle_, result, error);
+    telco_session_resume_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -192,14 +192,14 @@ NAN_METHOD(Session::Resume) {
 
 namespace {
 
-class EnableChildGatingOperation : public Operation<FridaSession> {
+class EnableChildGatingOperation : public Operation<TelcoSession> {
  protected:
   void Begin() {
-    frida_session_enable_child_gating(handle_, cancellable_, OnReady, this);
+    telco_session_enable_child_gating(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_session_enable_child_gating_finish(handle_, result, error);
+    telco_session_enable_child_gating_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -221,14 +221,14 @@ NAN_METHOD(Session::EnableChildGating) {
 
 namespace {
 
-class DisableChildGatingOperation : public Operation<FridaSession> {
+class DisableChildGatingOperation : public Operation<TelcoSession> {
  protected:
   void Begin() {
-    frida_session_disable_child_gating(handle_, cancellable_, OnReady, this);
+    telco_session_disable_child_gating(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_session_disable_child_gating_finish(handle_, result, error);
+    telco_session_disable_child_gating_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -250,9 +250,9 @@ NAN_METHOD(Session::DisableChildGating) {
 
 namespace {
 
-class CreateScriptOperation : public Operation<FridaSession> {
+class CreateScriptOperation : public Operation<TelcoSession> {
  public:
-  CreateScriptOperation(gchar* source, FridaScriptOptions* options)
+  CreateScriptOperation(gchar* source, TelcoScriptOptions* options)
     : source_(source),
       options_(options) {
   }
@@ -264,12 +264,12 @@ class CreateScriptOperation : public Operation<FridaSession> {
 
  protected:
   void Begin() {
-    frida_session_create_script(handle_, source_, options_, cancellable_,
+    telco_session_create_script(handle_, source_, options_, cancellable_,
         OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    script_ = frida_session_create_script_finish(handle_, result, error);
+    script_ = telco_session_create_script_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -280,8 +280,8 @@ class CreateScriptOperation : public Operation<FridaSession> {
 
  private:
   gchar* source_;
-  FridaScriptOptions* options_;
-  FridaScript* script_;
+  TelcoScriptOptions* options_;
+  TelcoScript* script_;
 };
 
 }
@@ -311,7 +311,7 @@ NAN_METHOD(Session::CreateScript) {
     valid = false;
   }
 
-  FridaScriptOptions* options = NULL;
+  TelcoScriptOptions* options = NULL;
   if (valid) {
     options = ParseScriptOptions(name_value, snapshot_value, runtime_value);
     valid = options != NULL;
@@ -331,9 +331,9 @@ NAN_METHOD(Session::CreateScript) {
 
 namespace {
 
-class CreateScriptFromBytesOperation : public Operation<FridaSession> {
+class CreateScriptFromBytesOperation : public Operation<TelcoSession> {
  public:
-  CreateScriptFromBytesOperation(GBytes* bytes, FridaScriptOptions* options)
+  CreateScriptFromBytesOperation(GBytes* bytes, TelcoScriptOptions* options)
     : bytes_(bytes),
       options_(options) {
   }
@@ -345,12 +345,12 @@ class CreateScriptFromBytesOperation : public Operation<FridaSession> {
 
  protected:
   void Begin() {
-    frida_session_create_script_from_bytes(handle_, bytes_, options_,
+    telco_session_create_script_from_bytes(handle_, bytes_, options_,
         cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    script_ = frida_session_create_script_from_bytes_finish(handle_, result,
+    script_ = telco_session_create_script_from_bytes_finish(handle_, result,
         error);
   }
 
@@ -362,8 +362,8 @@ class CreateScriptFromBytesOperation : public Operation<FridaSession> {
 
  private:
   GBytes* bytes_;
-  FridaScriptOptions* options_;
-  FridaScript* script_;
+  TelcoScriptOptions* options_;
+  TelcoScript* script_;
 };
 
 }
@@ -393,7 +393,7 @@ NAN_METHOD(Session::CreateScriptFromBytes) {
     valid = false;
   }
 
-  FridaScriptOptions* options = NULL;
+  TelcoScriptOptions* options = NULL;
   if (valid) {
     options = ParseScriptOptions(name_value, snapshot_value, runtime_value);
     valid = options != NULL;
@@ -413,9 +413,9 @@ NAN_METHOD(Session::CreateScriptFromBytes) {
 
 namespace {
 
-class CompileScriptOperation : public Operation<FridaSession> {
+class CompileScriptOperation : public Operation<TelcoSession> {
  public:
-  CompileScriptOperation(gchar* source, FridaScriptOptions* options)
+  CompileScriptOperation(gchar* source, TelcoScriptOptions* options)
     : source_(source),
       options_(options) {
   }
@@ -427,12 +427,12 @@ class CompileScriptOperation : public Operation<FridaSession> {
 
  protected:
   void Begin() {
-    frida_session_compile_script(handle_, source_, options_, cancellable_,
+    telco_session_compile_script(handle_, source_, options_, cancellable_,
         OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    bytes_ = frida_session_compile_script_finish(handle_, result, error);
+    bytes_ = telco_session_compile_script_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -444,7 +444,7 @@ class CompileScriptOperation : public Operation<FridaSession> {
 
  private:
   gchar* source_;
-  FridaScriptOptions* options_;
+  TelcoScriptOptions* options_;
   GBytes* bytes_;
 };
 
@@ -473,7 +473,7 @@ NAN_METHOD(Session::CompileScript) {
     valid = false;
   }
 
-  FridaScriptOptions* options = NULL;
+  TelcoScriptOptions* options = NULL;
   if (valid) {
     options = ParseScriptOptions(name_value, Nan::Null(), runtime_value);
     valid = options != NULL;
@@ -491,16 +491,16 @@ NAN_METHOD(Session::CompileScript) {
   info.GetReturnValue().Set(operation->GetPromise(isolate));
 }
 
-static FridaScriptOptions* ParseScriptOptions(Local<Value> name_value,
+static TelcoScriptOptions* ParseScriptOptions(Local<Value> name_value,
     Local<Value> snapshot_value, Local<Value> runtime_value) {
-  auto options = frida_script_options_new();
+  auto options = telco_script_options_new();
   bool valid = true;
 
   if (!name_value->IsNull()) {
     Nan::Utf8String val(name_value);
     const gchar* name = *val;
     if (name != NULL) {
-      frida_script_options_set_name(options, name);
+      telco_script_options_set_name(options, name);
     } else {
       Nan::ThrowTypeError("Bad argument, 'name' must be a string");
       valid = false;
@@ -511,7 +511,7 @@ static FridaScriptOptions* ParseScriptOptions(Local<Value> name_value,
     if (node::Buffer::HasInstance(snapshot_value)) {
       auto snapshot = g_bytes_new(node::Buffer::Data(snapshot_value),
           node::Buffer::Length(snapshot_value));
-      frida_script_options_set_snapshot(options, snapshot);
+      telco_script_options_set_snapshot(options, snapshot);
       g_bytes_unref(snapshot);
     } else {
       Nan::ThrowTypeError("Bad argument, 'snapshot' must be a Buffer");
@@ -520,11 +520,11 @@ static FridaScriptOptions* ParseScriptOptions(Local<Value> name_value,
   }
 
   if (valid && !runtime_value->IsNull()) {
-    FridaScriptRuntime runtime;
-    valid = Runtime::ValueToEnum(runtime_value, FRIDA_TYPE_SCRIPT_RUNTIME,
+    TelcoScriptRuntime runtime;
+    valid = Runtime::ValueToEnum(runtime_value, TELCO_TYPE_SCRIPT_RUNTIME,
         &runtime);
     if (valid) {
-      frida_script_options_set_runtime(options, runtime);
+      telco_script_options_set_runtime(options, runtime);
     }
   }
 
@@ -538,9 +538,9 @@ static FridaScriptOptions* ParseScriptOptions(Local<Value> name_value,
 
 namespace {
 
-class SnapshotScriptOperation : public Operation<FridaSession> {
+class SnapshotScriptOperation : public Operation<TelcoSession> {
  public:
-  SnapshotScriptOperation(gchar* embed_script, FridaSnapshotOptions* options)
+  SnapshotScriptOperation(gchar* embed_script, TelcoSnapshotOptions* options)
     : embed_script_(embed_script),
       options_(options) {
   }
@@ -552,12 +552,12 @@ class SnapshotScriptOperation : public Operation<FridaSession> {
 
  protected:
   void Begin() {
-    frida_session_snapshot_script(handle_, embed_script_, options_,
+    telco_session_snapshot_script(handle_, embed_script_, options_,
         cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    bytes_ = frida_session_snapshot_script_finish(handle_, result, error);
+    bytes_ = telco_session_snapshot_script_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -569,7 +569,7 @@ class SnapshotScriptOperation : public Operation<FridaSession> {
 
  private:
   gchar* embed_script_;
-  FridaSnapshotOptions* options_;
+  TelcoSnapshotOptions* options_;
   GBytes* bytes_;
 };
 
@@ -598,7 +598,7 @@ NAN_METHOD(Session::SnapshotScript) {
     valid = false;
   }
 
-  FridaSnapshotOptions* options = NULL;
+  TelcoSnapshotOptions* options = NULL;
   if (valid) {
     options = ParseSnapshotOptions(warmup_script_value, runtime_value);
     valid = options != NULL;
@@ -616,16 +616,16 @@ NAN_METHOD(Session::SnapshotScript) {
   info.GetReturnValue().Set(operation->GetPromise(isolate));
 }
 
-static FridaSnapshotOptions* ParseSnapshotOptions(
+static TelcoSnapshotOptions* ParseSnapshotOptions(
     Local<Value> warmup_script_value, Local<Value> runtime_value) {
-  auto options = frida_snapshot_options_new();
+  auto options = telco_snapshot_options_new();
   bool valid = true;
 
   if (!warmup_script_value->IsNull()) {
     Nan::Utf8String val(warmup_script_value);
     const gchar* warmup_script = *val;
     if (warmup_script != NULL) {
-      frida_snapshot_options_set_warmup_script(options, warmup_script);
+      telco_snapshot_options_set_warmup_script(options, warmup_script);
     } else {
       Nan::ThrowTypeError("Bad argument, 'warmupScript' must be a string");
       valid = false;
@@ -633,11 +633,11 @@ static FridaSnapshotOptions* ParseSnapshotOptions(
   }
 
   if (valid && !runtime_value->IsNull()) {
-    FridaScriptRuntime runtime;
-    valid = Runtime::ValueToEnum(runtime_value, FRIDA_TYPE_SCRIPT_RUNTIME,
+    TelcoScriptRuntime runtime;
+    valid = Runtime::ValueToEnum(runtime_value, TELCO_TYPE_SCRIPT_RUNTIME,
         &runtime);
     if (valid) {
-      frida_snapshot_options_set_runtime(options, runtime);
+      telco_snapshot_options_set_runtime(options, runtime);
     }
   }
 
@@ -651,9 +651,9 @@ static FridaSnapshotOptions* ParseSnapshotOptions(
 
 namespace {
 
-class SetupPeerConnectionOperation : public Operation<FridaSession> {
+class SetupPeerConnectionOperation : public Operation<TelcoSession> {
  public:
-  SetupPeerConnectionOperation(FridaPeerOptions* options) : options_(options) {
+  SetupPeerConnectionOperation(TelcoPeerOptions* options) : options_(options) {
   }
 
   ~SetupPeerConnectionOperation() {
@@ -662,12 +662,12 @@ class SetupPeerConnectionOperation : public Operation<FridaSession> {
 
  protected:
   void Begin() {
-    frida_session_setup_peer_connection(handle_, options_, cancellable_,
+    telco_session_setup_peer_connection(handle_, options_, cancellable_,
         OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_session_setup_peer_connection_finish(handle_, result, error);
+    telco_session_setup_peer_connection_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -675,7 +675,7 @@ class SetupPeerConnectionOperation : public Operation<FridaSession> {
   }
 
  private:
-  FridaPeerOptions* options_;
+  TelcoPeerOptions* options_;
 };
 
 }
@@ -692,13 +692,13 @@ NAN_METHOD(Session::SetupPeerConnection) {
   auto stun_server_value = info[0];
   auto relays_value = info[1];
 
-  auto options = frida_peer_options_new();
+  auto options = telco_peer_options_new();
   bool valid = true;
 
   if (!stun_server_value->IsNull()) {
     if (stun_server_value->IsString()) {
       Nan::Utf8String stun_server(stun_server_value);
-      frida_peer_options_set_stun_server(options, *stun_server);
+      telco_peer_options_set_stun_server(options, *stun_server);
     } else {
       Nan::ThrowTypeError("Bad argument, 'stunServer' must be a string");
       valid = false;
@@ -713,13 +713,13 @@ NAN_METHOD(Session::SetupPeerConnection) {
 
       for (uint32_t i = 0; i != n; i++) {
         auto element_value = Nan::Get(array, i).ToLocalChecked();
-        FridaRelay* relay = Relay::TryParse(element_value, wrapper->runtime_);
+        TelcoRelay* relay = Relay::TryParse(element_value, wrapper->runtime_);
         if (relay == NULL) {
           Nan::ThrowTypeError("Bad argument, 'relays' element type mismatch");
           valid = false;
           break;
         }
-        frida_peer_options_add_relay(options, relay);
+        telco_peer_options_add_relay(options, relay);
       }
     } else {
       Nan::ThrowTypeError("Bad argument, 'relays' must be an array");
@@ -740,9 +740,9 @@ NAN_METHOD(Session::SetupPeerConnection) {
 
 namespace {
 
-class JoinPortalOperation : public Operation<FridaSession> {
+class JoinPortalOperation : public Operation<TelcoSession> {
  public:
-  JoinPortalOperation(gchar* address, FridaPortalOptions* options)
+  JoinPortalOperation(gchar* address, TelcoPortalOptions* options)
     : address_(address),
       options_(options) {
   }
@@ -754,12 +754,12 @@ class JoinPortalOperation : public Operation<FridaSession> {
 
  protected:
   void Begin() {
-    frida_session_join_portal(handle_, address_, options_, cancellable_,
+    telco_session_join_portal(handle_, address_, options_, cancellable_,
         OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    membership_ = frida_session_join_portal_finish(handle_, result, error);
+    membership_ = telco_session_join_portal_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -770,8 +770,8 @@ class JoinPortalOperation : public Operation<FridaSession> {
 
  private:
   gchar* address_;
-  FridaPortalOptions* options_;
-  FridaPortalMembership* membership_;
+  TelcoPortalOptions* options_;
+  TelcoPortalMembership* membership_;
 };
 
 }
@@ -796,14 +796,14 @@ NAN_METHOD(Session::JoinPortal) {
   }
   Nan::Utf8String address(address_value);
 
-  auto options = frida_portal_options_new();
+  auto options = telco_portal_options_new();
   bool valid = true;
 
   if (!certificate_value->IsNull()) {
     GTlsCertificate* certificate;
     valid = Runtime::ValueToCertificate(certificate_value, &certificate);
     if (valid) {
-      frida_portal_options_set_certificate(options, certificate);
+      telco_portal_options_set_certificate(options, certificate);
       g_object_unref(certificate);
     }
   }
@@ -811,7 +811,7 @@ NAN_METHOD(Session::JoinPortal) {
   if (valid && !token_value->IsNull()) {
     if (token_value->IsString()) {
       Nan::Utf8String token(token_value);
-      frida_portal_options_set_token(options, *token);
+      telco_portal_options_set_token(options, *token);
     } else {
       Nan::ThrowTypeError("Bad argument, 'token' must be a string");
       valid = false;
@@ -823,7 +823,7 @@ NAN_METHOD(Session::JoinPortal) {
     gint acl_length;
     valid = Runtime::ValueToEnvp(acl_value, &acl, &acl_length);
     if (valid) {
-      frida_portal_options_set_acl(options, acl, acl_length);
+      telco_portal_options_set_acl(options, acl, acl_length);
       g_strfreev(acl);
     }
   }

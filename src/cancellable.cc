@@ -15,7 +15,7 @@ using v8::Persistent;
 using v8::ReadOnly;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
 Cancellable::Cancellable(GCancellable* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {

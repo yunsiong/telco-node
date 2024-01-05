@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_USAGE_MONITOR_H
-#define FRIDANODE_USAGE_MONITOR_H
+#ifndef TELCONODE_USAGE_MONITOR_H
+#define TELCONODE_USAGE_MONITOR_H
 
 #include "glib_object.h"
 
 using Nan::HandleScope;
 
-namespace frida {
+namespace telco {
 
 template<typename T>
 class UsageMonitor {

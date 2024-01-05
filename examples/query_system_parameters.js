@@ -1,9 +1,9 @@
-const frida = require('..');
+const telco = require('..');
 
 async function main() {
-  console.log('Local parameters:', await frida.querySystemParameters());
+  console.log('Local parameters:', await telco.querySystemParameters());
 
-  const device = await frida.getUsbDevice();
+  const device = await telco.getUsbDevice();
   console.log('USB device parameters:', await device.querySystemParameters());
 }
 

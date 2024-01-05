@@ -13,9 +13,9 @@ using v8::Persistent;
 using v8::ReadOnly;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-Spawn::Spawn(FridaSpawn* handle, Runtime* runtime)
+Spawn::Spawn(TelcoSpawn* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
@@ -65,7 +65,7 @@ NAN_METHOD(Spawn::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaSpawn*>(
+  auto handle = static_cast<TelcoSpawn*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new Spawn(handle, runtime);
   auto obj = info.This();
@@ -76,16 +76,16 @@ NAN_METHOD(Spawn::New) {
 
 NAN_PROPERTY_GETTER(Spawn::GetPid) {
   auto handle = ObjectWrap::Unwrap<Spawn>(
-      info.Holder())->GetHandle<FridaSpawn>();
+      info.Holder())->GetHandle<TelcoSpawn>();
 
-  info.GetReturnValue().Set(Nan::New<Integer>(frida_spawn_get_pid(handle)));
+  info.GetReturnValue().Set(Nan::New<Integer>(telco_spawn_get_pid(handle)));
 }
 
 NAN_PROPERTY_GETTER(Spawn::GetIdentifier) {
   auto handle = ObjectWrap::Unwrap<Spawn>(
-      info.Holder())->GetHandle<FridaSpawn>();
+      info.Holder())->GetHandle<TelcoSpawn>();
 
-  auto identifier = frida_spawn_get_identifier(handle);
+  auto identifier = telco_spawn_get_identifier(handle);
   if (identifier != NULL)
     info.GetReturnValue().Set(Nan::New(identifier).ToLocalChecked());
   else

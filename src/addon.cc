@@ -24,17 +24,17 @@ using v8::Local;
 using v8::Object;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
 static void DisposeAll(void* data);
 
 static void InitAll(Local<Object> exports,
     Local<Value> module,
     Local<Context> context) {
-  frida_init();
+  telco_init();
 
   auto uv_context = new UVContext(uv_default_loop());
-  auto glib_context = new GLibContext(frida_get_main_context());
+  auto glib_context = new GLibContext(telco_get_main_context());
   auto runtime = new Runtime(uv_context, glib_context);
 
   Signals::Init(exports, runtime);
@@ -73,4 +73,4 @@ static void DisposeAll(void* data) {
 
 }
 
-NODE_MODULE_CONTEXT_AWARE(frida_binding, frida::InitAll)
+NODE_MODULE_CONTEXT_AWARE(telco_binding, telco::InitAll)

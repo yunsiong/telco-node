@@ -6,7 +6,7 @@ using v8::Local;
 using v8::String;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
 Local<FunctionTemplate> GLibObject::CreateTemplate(Local<String> name,
     Nan::FunctionCallback callback, Runtime* runtime) {

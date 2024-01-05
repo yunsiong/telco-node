@@ -31,15 +31,15 @@ using v8::String;
 using v8::Uint32;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-Device::Device(FridaDevice* handle, Runtime* runtime)
+Device::Device(TelcoDevice* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
 
 Device::~Device() {
-  frida_unref(handle_);
+  telco_unref(handle_);
 }
 
 void Device::Init(Local<Object> exports, Runtime* runtime) {
@@ -111,7 +111,7 @@ NAN_METHOD(Device::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaDevice*>(
+  auto handle = static_cast<TelcoDevice*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new Device(handle, runtime);
   auto obj = info.This();
@@ -129,25 +129,25 @@ NAN_METHOD(Device::New) {
 
 NAN_PROPERTY_GETTER(Device::GetId) {
   auto handle = ObjectWrap::Unwrap<Device>(
-      info.Holder())->GetHandle<FridaDevice>();
+      info.Holder())->GetHandle<TelcoDevice>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_device_get_id(handle)).ToLocalChecked());
+      Nan::New(telco_device_get_id(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Device::GetName) {
   auto handle = ObjectWrap::Unwrap<Device>(
-      info.Holder())->GetHandle<FridaDevice>();
+      info.Holder())->GetHandle<TelcoDevice>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_device_get_name(handle)).ToLocalChecked());
+      Nan::New(telco_device_get_name(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Device::GetIcon) {
   auto wrapper = ObjectWrap::Unwrap<Device>(info.Holder());
-  auto handle = wrapper->GetHandle<FridaDevice>();
+  auto handle = wrapper->GetHandle<TelcoDevice>();
 
-  GVariant* icon = frida_device_get_icon(handle);
+  GVariant* icon = telco_device_get_icon(handle);
   if (icon != NULL)
     info.GetReturnValue().Set(Runtime::ValueFromVariant(icon));
   else
@@ -156,38 +156,38 @@ NAN_PROPERTY_GETTER(Device::GetIcon) {
 
 NAN_PROPERTY_GETTER(Device::GetType) {
   auto handle = ObjectWrap::Unwrap<Device>(
-      info.Holder())->GetHandle<FridaDevice>();
+      info.Holder())->GetHandle<TelcoDevice>();
 
   info.GetReturnValue().Set(Runtime::ValueFromEnum(
-      frida_device_get_dtype(handle), FRIDA_TYPE_DEVICE_TYPE));
+      telco_device_get_dtype(handle), TELCO_TYPE_DEVICE_TYPE));
 }
 
 NAN_PROPERTY_GETTER(Device::GetBus) {
   auto wrapper = ObjectWrap::Unwrap<Device>(info.Holder());
-  auto handle = wrapper->GetHandle<FridaDevice>();
+  auto handle = wrapper->GetHandle<TelcoDevice>();
 
   info.GetReturnValue().Set(
-      Bus::New(frida_device_get_bus(handle), wrapper->runtime_));
+      Bus::New(telco_device_get_bus(handle), wrapper->runtime_));
 }
 
 NAN_PROPERTY_GETTER(Device::IsLost) {
   auto handle = ObjectWrap::Unwrap<Device>(
-      info.Holder())->GetHandle<FridaDevice>();
+      info.Holder())->GetHandle<TelcoDevice>();
 
   info.GetReturnValue().Set(
-      Nan::New(static_cast<bool>(frida_device_is_lost(handle))));
+      Nan::New(static_cast<bool>(telco_device_is_lost(handle))));
 }
 
 namespace {
 
-class QuerySystemParametersOperation : public Operation<FridaDevice> {
+class QuerySystemParametersOperation : public Operation<TelcoDevice> {
  protected:
   void Begin() {
-    frida_device_query_system_parameters(handle_, cancellable_, OnReady, this);
+    telco_device_query_system_parameters(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    parameters_ = frida_device_query_system_parameters_finish(handle_, result,
+    parameters_ = telco_device_query_system_parameters_finish(handle_, result,
         error);
   }
 
@@ -215,9 +215,9 @@ NAN_METHOD(Device::QuerySystemParameters) {
 
 namespace {
 
-class GetFrontmostApplicationOperation : public Operation<FridaDevice> {
+class GetFrontmostApplicationOperation : public Operation<TelcoDevice> {
  public:
-  GetFrontmostApplicationOperation(FridaFrontmostQueryOptions* options)
+  GetFrontmostApplicationOperation(TelcoFrontmostQueryOptions* options)
     : application_(NULL),
       options_(options) {
   }
@@ -229,12 +229,12 @@ class GetFrontmostApplicationOperation : public Operation<FridaDevice> {
 
  protected:
   void Begin() {
-    frida_device_get_frontmost_application(handle_, options_, cancellable_,
+    telco_device_get_frontmost_application(handle_, options_, cancellable_,
         OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    application_ = frida_device_get_frontmost_application_finish(handle_,
+    application_ = telco_device_get_frontmost_application_finish(handle_,
         result, error);
   }
 
@@ -245,8 +245,8 @@ class GetFrontmostApplicationOperation : public Operation<FridaDevice> {
   }
 
  private:
-  FridaApplication* application_;
-  FridaFrontmostQueryOptions* options_;
+  TelcoApplication* application_;
+  TelcoFrontmostQueryOptions* options_;
 };
 
 }
@@ -262,13 +262,13 @@ NAN_METHOD(Device::GetFrontmostApplication) {
 
   auto scope_value = info[0];
 
-  auto options = frida_frontmost_query_options_new();
+  auto options = telco_frontmost_query_options_new();
   bool valid = true;
 
   if (!scope_value->IsNull()) {
-    FridaScope scope;
-    if (Runtime::ValueToEnum(scope_value, FRIDA_TYPE_SCOPE, &scope))
-      frida_frontmost_query_options_set_scope(options, scope);
+    TelcoScope scope;
+    if (Runtime::ValueToEnum(scope_value, TELCO_TYPE_SCOPE, &scope))
+      telco_frontmost_query_options_set_scope(options, scope);
     else
       valid = false;
   }
@@ -286,9 +286,9 @@ NAN_METHOD(Device::GetFrontmostApplication) {
 
 namespace {
 
-class EnumerateApplicationsOperation : public Operation<FridaDevice> {
+class EnumerateApplicationsOperation : public Operation<TelcoDevice> {
  public:
-  EnumerateApplicationsOperation(FridaApplicationQueryOptions* options)
+  EnumerateApplicationsOperation(TelcoApplicationQueryOptions* options)
     : applications_(NULL),
       options_(options) {
   }
@@ -300,20 +300,20 @@ class EnumerateApplicationsOperation : public Operation<FridaDevice> {
 
  protected:
   void Begin() {
-    frida_device_enumerate_applications(handle_, options_, cancellable_,
+    telco_device_enumerate_applications(handle_, options_, cancellable_,
         OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    applications_ = frida_device_enumerate_applications_finish(handle_, result,
+    applications_ = telco_device_enumerate_applications_finish(handle_, result,
         error);
   }
 
   Local<Value> Result(Isolate* isolate) {
-    auto size = frida_application_list_size(applications_);
+    auto size = telco_application_list_size(applications_);
     auto applications = Nan::New<Array>(size);
     for (auto i = 0; i != size; i++) {
-      auto handle = frida_application_list_get(applications_, i);
+      auto handle = telco_application_list_get(applications_, i);
       auto application = Application::New(handle, runtime_);
       Nan::Set(applications, i, application);
       g_object_unref(handle);
@@ -322,8 +322,8 @@ class EnumerateApplicationsOperation : public Operation<FridaDevice> {
   }
 
  private:
-  FridaApplicationList* applications_;
-  FridaApplicationQueryOptions* options_;
+  TelcoApplicationList* applications_;
+  TelcoApplicationQueryOptions* options_;
 };
 
 }
@@ -340,7 +340,7 @@ NAN_METHOD(Device::EnumerateApplications) {
   auto identifiers_value = info[0];
   auto scope_value = info[1];
 
-  auto options = frida_application_query_options_new();
+  auto options = telco_application_query_options_new();
   bool valid = true;
 
   if (identifiers_value->IsArray()) {
@@ -358,7 +358,7 @@ NAN_METHOD(Device::EnumerateApplications) {
       }
       Nan::Utf8String identifier(element_value);
 
-      frida_application_query_options_select_identifier(options, *identifier);
+      telco_application_query_options_select_identifier(options, *identifier);
     }
   } else {
     Nan::ThrowTypeError("Bad argument, 'identifiers' must be an array of "
@@ -367,9 +367,9 @@ NAN_METHOD(Device::EnumerateApplications) {
   }
 
   if (valid && !scope_value->IsNull()) {
-    FridaScope scope;
-    if (Runtime::ValueToEnum(scope_value, FRIDA_TYPE_SCOPE, &scope))
-      frida_application_query_options_set_scope(options, scope);
+    TelcoScope scope;
+    if (Runtime::ValueToEnum(scope_value, TELCO_TYPE_SCOPE, &scope))
+      telco_application_query_options_set_scope(options, scope);
     else
       valid = false;
   }
@@ -387,9 +387,9 @@ NAN_METHOD(Device::EnumerateApplications) {
 
 namespace {
 
-class EnumerateProcessesOperation : public Operation<FridaDevice> {
+class EnumerateProcessesOperation : public Operation<TelcoDevice> {
  public:
-  EnumerateProcessesOperation(FridaProcessQueryOptions* options)
+  EnumerateProcessesOperation(TelcoProcessQueryOptions* options)
     : processes_(NULL),
       options_(options) {
   }
@@ -401,20 +401,20 @@ class EnumerateProcessesOperation : public Operation<FridaDevice> {
 
  protected:
   void Begin() {
-    frida_device_enumerate_processes(handle_, options_, cancellable_, OnReady,
+    telco_device_enumerate_processes(handle_, options_, cancellable_, OnReady,
         this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    processes_ = frida_device_enumerate_processes_finish(handle_, result,
+    processes_ = telco_device_enumerate_processes_finish(handle_, result,
         error);
   }
 
   Local<Value> Result(Isolate* isolate) {
-    auto size = frida_process_list_size(processes_);
+    auto size = telco_process_list_size(processes_);
     auto processes = Nan::New<Array>(size);
     for (auto i = 0; i != size; i++) {
-      auto handle = frida_process_list_get(processes_, i);
+      auto handle = telco_process_list_get(processes_, i);
       auto process = Process::New(handle, runtime_);
       Nan::Set(processes, i, process);
       g_object_unref(handle);
@@ -423,8 +423,8 @@ class EnumerateProcessesOperation : public Operation<FridaDevice> {
   }
 
  private:
-  FridaProcessList* processes_;
-  FridaProcessQueryOptions* options_;
+  TelcoProcessList* processes_;
+  TelcoProcessQueryOptions* options_;
 };
 
 }
@@ -441,7 +441,7 @@ NAN_METHOD(Device::EnumerateProcesses) {
   auto pids_value = info[0];
   auto scope_value = info[1];
 
-  auto options = frida_process_query_options_new();
+  auto options = telco_process_query_options_new();
   bool valid = true;
 
   if (pids_value->IsArray()) {
@@ -462,7 +462,7 @@ NAN_METHOD(Device::EnumerateProcesses) {
         break;
       }
 
-      frida_process_query_options_select_pid(options, pid);
+      telco_process_query_options_select_pid(options, pid);
     }
   } else {
     Nan::ThrowTypeError("Bad argument, 'pids' must be an array of process IDs");
@@ -470,9 +470,9 @@ NAN_METHOD(Device::EnumerateProcesses) {
   }
 
   if (valid && !scope_value->IsNull()) {
-    FridaScope scope;
-    if (Runtime::ValueToEnum(scope_value, FRIDA_TYPE_SCOPE, &scope))
-      frida_process_query_options_set_scope(options, scope);
+    TelcoScope scope;
+    if (Runtime::ValueToEnum(scope_value, TELCO_TYPE_SCOPE, &scope))
+      telco_process_query_options_set_scope(options, scope);
     else
       valid = false;
   }
@@ -490,14 +490,14 @@ NAN_METHOD(Device::EnumerateProcesses) {
 
 namespace {
 
-class EnableSpawnGatingOperation : public Operation<FridaDevice> {
+class EnableSpawnGatingOperation : public Operation<TelcoDevice> {
  protected:
   void Begin() {
-    frida_device_enable_spawn_gating(handle_, cancellable_, OnReady, this);
+    telco_device_enable_spawn_gating(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_device_enable_spawn_gating_finish(handle_, result, error);
+    telco_device_enable_spawn_gating_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -519,14 +519,14 @@ NAN_METHOD(Device::EnableSpawnGating) {
 
 namespace {
 
-class DisableSpawnGatingOperation : public Operation<FridaDevice> {
+class DisableSpawnGatingOperation : public Operation<TelcoDevice> {
  protected:
   void Begin() {
-    frida_device_disable_spawn_gating(handle_, cancellable_, OnReady, this);
+    telco_device_disable_spawn_gating(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_device_disable_spawn_gating_finish(handle_, result, error);
+    telco_device_disable_spawn_gating_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -548,22 +548,22 @@ NAN_METHOD(Device::DisableSpawnGating) {
 
 namespace {
 
-class EnumeratePendingSpawnOperation : public Operation<FridaDevice> {
+class EnumeratePendingSpawnOperation : public Operation<TelcoDevice> {
  protected:
   void Begin() {
-    frida_device_enumerate_pending_spawn(handle_, cancellable_, OnReady, this);
+    telco_device_enumerate_pending_spawn(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    pending_spawn_ = frida_device_enumerate_pending_spawn_finish(handle_,
+    pending_spawn_ = telco_device_enumerate_pending_spawn_finish(handle_,
         result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
-    auto size = frida_spawn_list_size(pending_spawn_);
+    auto size = telco_spawn_list_size(pending_spawn_);
     auto pending_spawn = Nan::New<Array>(size);
     for (auto i = 0; i != size; i++) {
-      auto handle = frida_spawn_list_get(pending_spawn_, i);
+      auto handle = telco_spawn_list_get(pending_spawn_, i);
       auto spawn = Spawn::New(handle, runtime_);
       Nan::Set(pending_spawn, i, spawn);
       g_object_unref(handle);
@@ -575,7 +575,7 @@ class EnumeratePendingSpawnOperation : public Operation<FridaDevice> {
   }
 
  private:
-  FridaSpawnList* pending_spawn_;
+  TelcoSpawnList* pending_spawn_;
 };
 
 }
@@ -592,23 +592,23 @@ NAN_METHOD(Device::EnumeratePendingSpawn) {
 
 namespace {
 
-class EnumeratePendingChildrenOperation : public Operation<FridaDevice> {
+class EnumeratePendingChildrenOperation : public Operation<TelcoDevice> {
  protected:
   void Begin() {
-    frida_device_enumerate_pending_children(handle_, cancellable_, OnReady,
+    telco_device_enumerate_pending_children(handle_, cancellable_, OnReady,
         this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    pending_children_ = frida_device_enumerate_pending_children_finish(handle_,
+    pending_children_ = telco_device_enumerate_pending_children_finish(handle_,
         result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
-    auto size = frida_child_list_size(pending_children_);
+    auto size = telco_child_list_size(pending_children_);
     auto pending_children = Nan::New<Array>(size);
     for (auto i = 0; i != size; i++) {
-      auto handle = frida_child_list_get(pending_children_, i);
+      auto handle = telco_child_list_get(pending_children_, i);
       auto child = Child::New(handle, runtime_);
       Nan::Set(pending_children, i, child);
       g_object_unref(handle);
@@ -620,7 +620,7 @@ class EnumeratePendingChildrenOperation : public Operation<FridaDevice> {
   }
 
  private:
-  FridaChildList* pending_children_;
+  TelcoChildList* pending_children_;
 };
 
 }
@@ -637,9 +637,9 @@ NAN_METHOD(Device::EnumeratePendingChildren) {
 
 namespace {
 
-class SpawnOperation : public Operation<FridaDevice> {
+class SpawnOperation : public Operation<TelcoDevice> {
  public:
-  SpawnOperation(gchar* program, FridaSpawnOptions* options)
+  SpawnOperation(gchar* program, TelcoSpawnOptions* options)
     : program_(program),
       options_(options) {
   }
@@ -651,12 +651,12 @@ class SpawnOperation : public Operation<FridaDevice> {
 
  protected:
   void Begin() {
-    frida_device_spawn(handle_, program_, options_, cancellable_, OnReady,
+    telco_device_spawn(handle_, program_, options_, cancellable_, OnReady,
         this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    pid_ = frida_device_spawn_finish(handle_, result, error);
+    pid_ = telco_device_spawn_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -665,7 +665,7 @@ class SpawnOperation : public Operation<FridaDevice> {
 
  private:
   gchar* program_;
-  FridaSpawnOptions* options_;
+  TelcoSpawnOptions* options_;
   guint pid_;
 };
 
@@ -695,7 +695,7 @@ NAN_METHOD(Device::Spawn) {
   }
   Nan::Utf8String program(program_value);
 
-  auto options = frida_spawn_options_new();
+  auto options = telco_spawn_options_new();
   bool valid = true;
 
   if (!argv_value->IsNull()) {
@@ -703,7 +703,7 @@ NAN_METHOD(Device::Spawn) {
     gint argv_length;
     valid = Runtime::ValueToStrv(argv_value, &argv, &argv_length);
     if (valid) {
-      frida_spawn_options_set_argv(options, argv, argv_length);
+      telco_spawn_options_set_argv(options, argv, argv_length);
       g_strfreev(argv);
     }
   }
@@ -713,7 +713,7 @@ NAN_METHOD(Device::Spawn) {
     gint envp_length;
     valid = Runtime::ValueToEnvp(envp_value, &envp, &envp_length);
     if (valid) {
-      frida_spawn_options_set_envp(options, envp, envp_length);
+      telco_spawn_options_set_envp(options, envp, envp_length);
       g_strfreev(envp);
     }
   }
@@ -723,7 +723,7 @@ NAN_METHOD(Device::Spawn) {
     gint env_length;
     valid = Runtime::ValueToEnvp(env_value, &env, &env_length);
     if (valid) {
-      frida_spawn_options_set_env(options, env, env_length);
+      telco_spawn_options_set_env(options, env, env_length);
       g_strfreev(env);
     }
   }
@@ -731,7 +731,7 @@ NAN_METHOD(Device::Spawn) {
   if (valid && !cwd_value->IsNull()) {
     if (cwd_value->IsString()) {
       Nan::Utf8String cwd(cwd_value);
-      frida_spawn_options_set_cwd(options, *cwd);
+      telco_spawn_options_set_cwd(options, *cwd);
     } else {
       Nan::ThrowTypeError("Bad argument, 'cwd' must be a string");
       valid = false;
@@ -739,10 +739,10 @@ NAN_METHOD(Device::Spawn) {
   }
 
   if (valid && !stdio_value->IsNull()) {
-    FridaStdio stdio;
-    valid = Runtime::ValueToEnum(stdio_value, FRIDA_TYPE_STDIO, &stdio);
+    TelcoStdio stdio;
+    valid = Runtime::ValueToEnum(stdio_value, TELCO_TYPE_STDIO, &stdio);
     if (valid)
-      frida_spawn_options_set_stdio(options, stdio);
+      telco_spawn_options_set_stdio(options, stdio);
   }
 
   if (valid) {
@@ -752,7 +752,7 @@ NAN_METHOD(Device::Spawn) {
       Local<Array> keys(object->GetOwnPropertyNames(context).ToLocalChecked());
       uint32_t n = keys->Length();
 
-      GHashTable* aux = frida_spawn_options_get_aux(options);
+      GHashTable* aux = telco_spawn_options_get_aux(options);
 
       for (uint32_t i = 0; i != n; i++) {
         auto key = Nan::Get(keys, i).ToLocalChecked();
@@ -794,7 +794,7 @@ NAN_METHOD(Device::Spawn) {
 
 namespace {
 
-class InputOperation : public Operation<FridaDevice> {
+class InputOperation : public Operation<TelcoDevice> {
  public:
   InputOperation(guint pid, GBytes* data)
     : pid_(pid), data_(data) {
@@ -806,11 +806,11 @@ class InputOperation : public Operation<FridaDevice> {
 
  protected:
   void Begin() {
-    frida_device_input(handle_, pid_, data_, cancellable_, OnReady, this);
+    telco_device_input(handle_, pid_, data_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_device_input_finish(handle_, result, error);
+    telco_device_input_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -852,18 +852,18 @@ NAN_METHOD(Device::Input) {
 
 namespace {
 
-class ResumeOperation : public Operation<FridaDevice> {
+class ResumeOperation : public Operation<TelcoDevice> {
  public:
   ResumeOperation(guint pid) : pid_(pid) {
   }
 
  protected:
   void Begin() {
-    frida_device_resume(handle_, pid_, cancellable_, OnReady, this);
+    telco_device_resume(handle_, pid_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_device_resume_finish(handle_, result, error);
+    telco_device_resume_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -898,18 +898,18 @@ NAN_METHOD(Device::Resume) {
 
 namespace {
 
-class KillOperation : public Operation<FridaDevice> {
+class KillOperation : public Operation<TelcoDevice> {
  public:
   KillOperation(guint pid) : pid_(pid) {
   }
 
  protected:
   void Begin() {
-    frida_device_kill(handle_, pid_, cancellable_, OnReady, this);
+    telco_device_kill(handle_, pid_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_device_kill_finish(handle_, result, error);
+    telco_device_kill_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -944,9 +944,9 @@ NAN_METHOD(Device::Kill) {
 
 namespace {
 
-class AttachOperation : public Operation<FridaDevice> {
+class AttachOperation : public Operation<TelcoDevice> {
  public:
-  AttachOperation(guint pid, FridaSessionOptions* options)
+  AttachOperation(guint pid, TelcoSessionOptions* options)
     : pid_(pid),
       options_(options) {
   }
@@ -957,11 +957,11 @@ class AttachOperation : public Operation<FridaDevice> {
 
  protected:
   void Begin() {
-    frida_device_attach(handle_, pid_, options_, cancellable_, OnReady, this);
+    telco_device_attach(handle_, pid_, options_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    session_ = frida_device_attach_finish(handle_, result, error);
+    session_ = telco_device_attach_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -972,8 +972,8 @@ class AttachOperation : public Operation<FridaDevice> {
 
  private:
   const guint pid_;
-  FridaSessionOptions* options_;
-  FridaSession* session_;
+  TelcoSessionOptions* options_;
+  TelcoSession* session_;
 };
 
 }
@@ -1000,13 +1000,13 @@ NAN_METHOD(Device::Attach) {
     return;
   }
 
-  auto options = frida_session_options_new();
+  auto options = telco_session_options_new();
   bool valid = true;
 
   if (!realm_value->IsNull()) {
-    FridaRealm realm;
-    if (Runtime::ValueToEnum(realm_value, FRIDA_TYPE_REALM, &realm))
-      frida_session_options_set_realm(options, realm);
+    TelcoRealm realm;
+    if (Runtime::ValueToEnum(realm_value, TELCO_TYPE_REALM, &realm))
+      telco_session_options_set_realm(options, realm);
     else
       valid = false;
   }
@@ -1016,7 +1016,7 @@ NAN_METHOD(Device::Attach) {
       auto persist_timeout =
           Nan::To<int32_t>(persist_timeout_value).FromMaybe(-1);
       if (persist_timeout >= 0) {
-        frida_session_options_set_persist_timeout(options, persist_timeout);
+        telco_session_options_set_persist_timeout(options, persist_timeout);
       } else {
         Nan::ThrowTypeError("Bad argument, invalid 'persistTimeout'");
         valid = false;
@@ -1040,7 +1040,7 @@ NAN_METHOD(Device::Attach) {
 
 namespace {
 
-class InjectLibraryFileOperation : public Operation<FridaDevice> {
+class InjectLibraryFileOperation : public Operation<TelcoDevice> {
  public:
   InjectLibraryFileOperation(guint pid, gchar* path, gchar* entrypoint,
       gchar* data)
@@ -1058,12 +1058,12 @@ class InjectLibraryFileOperation : public Operation<FridaDevice> {
 
  protected:
   void Begin() {
-    frida_device_inject_library_file(handle_, pid_, path_, entrypoint_, data_,
+    telco_device_inject_library_file(handle_, pid_, path_, entrypoint_, data_,
         cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    id_ = frida_device_inject_library_file_finish(handle_, result, error);
+    id_ = telco_device_inject_library_file_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -1108,7 +1108,7 @@ NAN_METHOD(Device::InjectLibraryFile) {
 
 namespace {
 
-class InjectLibraryBlobOperation : public Operation<FridaDevice> {
+class InjectLibraryBlobOperation : public Operation<TelcoDevice> {
  public:
   InjectLibraryBlobOperation(guint pid, GBytes* blob, gchar* entrypoint,
       gchar* data)
@@ -1126,12 +1126,12 @@ class InjectLibraryBlobOperation : public Operation<FridaDevice> {
 
  protected:
   void Begin() {
-    frida_device_inject_library_blob(handle_, pid_, blob_, entrypoint_, data_,
+    telco_device_inject_library_blob(handle_, pid_, blob_, entrypoint_, data_,
         cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    id_ = frida_device_inject_library_blob_finish(handle_, result, error);
+    id_ = telco_device_inject_library_blob_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -1179,7 +1179,7 @@ NAN_METHOD(Device::InjectLibraryBlob) {
 
 namespace {
 
-class OpenChannelOperation : public Operation<FridaDevice> {
+class OpenChannelOperation : public Operation<TelcoDevice> {
  public:
   OpenChannelOperation(gchar* address)
     : address_(address),
@@ -1192,11 +1192,11 @@ class OpenChannelOperation : public Operation<FridaDevice> {
 
  protected:
   void Begin() {
-    frida_device_open_channel(handle_, address_, cancellable_, OnReady, this);
+    telco_device_open_channel(handle_, address_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    stream_ = frida_device_open_channel_finish(handle_, result, error);
+    stream_ = telco_device_open_channel_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -1230,14 +1230,14 @@ NAN_METHOD(Device::OpenChannel) {
 
 namespace {
 
-class UnpairOperation : public Operation<FridaDevice> {
+class UnpairOperation : public Operation<TelcoDevice> {
  protected:
   void Begin() {
-    frida_device_unpair(handle_, cancellable_, OnReady, this);
+    telco_device_unpair(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_device_unpair_finish(handle_, result, error);
+    telco_device_unpair_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {

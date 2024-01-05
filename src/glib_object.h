@@ -1,5 +1,5 @@
-#ifndef FRIDANODE_GLIB_OBJECT_H
-#define FRIDANODE_GLIB_OBJECT_H
+#ifndef TELCONODE_GLIB_OBJECT_H
+#define TELCONODE_GLIB_OBJECT_H
 
 #include "runtime.h"
 
@@ -7,7 +7,7 @@
 #include <nan.h>
 #include <node_object_wrap.h>
 
-namespace frida {
+namespace telco {
 
 class GLibObject : public node::ObjectWrap {
  protected:

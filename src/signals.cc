@@ -19,7 +19,7 @@ using v8::String;
 using v8::Uint32;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
 struct SignalsClosure {
   GClosure closure;
@@ -58,7 +58,7 @@ Signals::Signals(gpointer handle, TransformCallback transform,
 
 Signals::~Signals() {
   g_assert(closures_ == NULL); // They keep us alive
-  frida_unref(handle_);
+  telco_unref(handle_);
 }
 
 void Signals::Init(Local<Object> exports, Runtime* runtime) {

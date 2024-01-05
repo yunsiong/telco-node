@@ -1,10 +1,10 @@
-# frida-node
+# telco-node
 
 [![NPM version][npm-v-image]][npm-link]
 [![NPM Downloads][npm-dm-image]][npm-link]
 
 
-Node.js bindings for [Frida](https://frida.re).
+Node.js bindings for [Telco](https://telco.re).
 
 ## Depends
 
@@ -21,12 +21,12 @@ npm install
 Install from source:
 
 ```sh
-FRIDA=/absolute/path/to/fully/compiled/frida/repo npm install
+TELCO=/absolute/path/to/fully/compiled/telco/repo npm install
 ```
 
 ## Examples
 
-* Follow [Setting up the experiment](https://frida.re/docs/functions/) to
+* Follow [Setting up the experiment](https://telco.re/docs/functions/) to
   produce a binary.
 * Run the binary.
 * Take note of the memory address the binary gives you when run.
@@ -53,6 +53,6 @@ make -C build
 npm run prebuild
 ```
 
-[npm-link]: https://www.npmjs.com/package/frida
-[npm-v-image]: https://img.shields.io/npm/v/frida.svg
-[npm-dm-image]: https://img.shields.io/npm/dm/frida.svg
+[npm-link]: https://www.npmjs.com/package/telco
+[npm-v-image]: https://img.shields.io/npm/v/telco.svg
+[npm-dm-image]: https://img.shields.io/npm/dm/telco.svg

@@ -1,4 +1,4 @@
-const frida = require('..');
+const telco = require('..');
 
 const processName = process.argv[2];
 
@@ -11,12 +11,12 @@ rpc.exports = {
 `;
 
 async function main() {
-  const systemSession = await frida.attach(0);
+  const systemSession = await telco.attach(0);
   const bytecode = await systemSession.compileScript(source, {
     name: 'bytecode-example'
   });
 
-  const session = await frida.attach(processName);
+  const session = await telco.attach(processName);
   const script = await session.createScriptFromBytes(bytecode);
   script.message.connect(message => {
     console.log('[*] Message:', message);

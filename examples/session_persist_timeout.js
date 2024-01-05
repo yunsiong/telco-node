@@ -1,8 +1,8 @@
-const frida = require('..');
+const telco = require('..');
 const readline = require('readline');
 
 async function main() {
-  const device = await frida.getRemoteDevice();
+  const device = await telco.getRemoteDevice();
 
   const session = await device.attach('hello2', {
     persistTimeout: 30

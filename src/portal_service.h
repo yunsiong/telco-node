@@ -1,18 +1,18 @@
-#ifndef FRIDANODE_PORTAL_SERVICE_H
-#define FRIDANODE_PORTAL_SERVICE_H
+#ifndef TELCONODE_PORTAL_SERVICE_H
+#define TELCONODE_PORTAL_SERVICE_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class PortalService : public GLibObject {
  public:
   static void Init(v8::Local<v8::Object> exports, Runtime* runtime);
 
  private:
-  explicit PortalService(FridaPortalService* handle, Runtime* runtime);
+  explicit PortalService(TelcoPortalService* handle, Runtime* runtime);
   ~PortalService();
 
   static NAN_METHOD(New);

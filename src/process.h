@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_PROCESS_H
-#define FRIDANODE_PROCESS_H
+#ifndef TELCONODE_PROCESS_H
+#define TELCONODE_PROCESS_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Process : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class Process : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  explicit Process(FridaProcess* handle, Runtime* runtime);
+  explicit Process(TelcoProcess* handle, Runtime* runtime);
   ~Process();
 
   static NAN_METHOD(New);

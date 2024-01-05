@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_CRASH_H
-#define FRIDANODE_CRASH_H
+#ifndef TELCONODE_CRASH_H
+#define TELCONODE_CRASH_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Crash : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class Crash : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  explicit Crash(FridaCrash* handle, Runtime* runtime);
+  explicit Crash(TelcoCrash* handle, Runtime* runtime);
   ~Crash();
 
   static NAN_METHOD(New);

@@ -1,10 +1,10 @@
-#ifndef FRIDANODE_OPERATION_H
-#define FRIDANODE_OPERATION_H
+#ifndef TELCONODE_OPERATION_H
+#define TELCONODE_OPERATION_H
 
 #include "cancellable.h"
 #include "runtime.h"
 
-namespace frida {
+namespace telco {
 
 template<class T>
 class Operation {

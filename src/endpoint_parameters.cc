@@ -12,9 +12,9 @@ using v8::Object;
 using v8::Persistent;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-EndpointParameters::EndpointParameters(FridaEndpointParameters* handle,
+EndpointParameters::EndpointParameters(TelcoEndpointParameters* handle,
     Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
@@ -36,7 +36,7 @@ void EndpointParameters::Init(Local<Object> exports, Runtime* runtime) {
       new Persistent<FunctionTemplate>(isolate, tpl));
 }
 
-FridaEndpointParameters* EndpointParameters::TryParse(Local<Value> value,
+TelcoEndpointParameters* EndpointParameters::TryParse(Local<Value> value,
     Runtime* runtime) {
   if (!value->IsObject())
     return NULL;
@@ -47,7 +47,7 @@ FridaEndpointParameters* EndpointParameters::TryParse(Local<Value> value,
     return NULL;
 
   return ObjectWrap::Unwrap<EndpointParameters>(
-      impl.As<Object>())->GetHandle<FridaEndpointParameters>();
+      impl.As<Object>())->GetHandle<TelcoEndpointParameters>();
 }
 
 bool EndpointParameters::HasInstance(Local<Value> value, Runtime* runtime) {
@@ -82,7 +82,7 @@ NAN_METHOD(EndpointParameters::New) {
   guint16 port = 0;
   GTlsCertificate* certificate = NULL;
   gchar* origin = NULL;
-  FridaAuthenticationService* auth_service = NULL;
+  TelcoAuthenticationService* auth_service = NULL;
   GFile* asset_root = NULL;
   bool valid = true;
 
@@ -123,8 +123,8 @@ NAN_METHOD(EndpointParameters::New) {
   if (valid && !auth_token_value->IsNull()) {
     if (auth_token_value->IsString()) {
       Nan::Utf8String auth_token(auth_token_value);
-      auth_service = FRIDA_AUTHENTICATION_SERVICE(
-          frida_static_authentication_service_new(*auth_token));
+      auth_service = TELCO_AUTHENTICATION_SERVICE(
+          telco_static_authentication_service_new(*auth_token));
     } else {
       Nan::ThrowTypeError("Bad argument, 'authToken' must be a string");
       valid = false;
@@ -133,7 +133,7 @@ NAN_METHOD(EndpointParameters::New) {
     if (auth_callback_value->IsFunction()) {
       auto auth_callback = Local<Function>::Cast(auth_callback_value);
       auth_service =
-          frida_node_authentication_service_new(auth_callback, runtime);
+          telco_node_authentication_service_new(auth_callback, runtime);
     } else {
       Nan::ThrowTypeError("Bad argument, 'authCallback' must be a function");
       valid = false;
@@ -151,7 +151,7 @@ NAN_METHOD(EndpointParameters::New) {
   }
 
   if (valid) {
-    auto handle = frida_endpoint_parameters_new(address, port, certificate,
+    auto handle = telco_endpoint_parameters_new(address, port, certificate,
         origin, auth_service, asset_root);
     auto wrapper = new EndpointParameters(handle, runtime);
     g_object_unref(handle);

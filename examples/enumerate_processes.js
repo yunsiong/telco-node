@@ -1,8 +1,8 @@
-const frida = require('..');
+const telco = require('..');
 const { inspect } = require('util');
 
 async function main() {
-  const device = await frida.getUsbDevice();
+  const device = await telco.getUsbDevice();
   const processes = await device.enumerateProcesses({ scope: 'full' });
   console.log('[*] Processes:', inspect(processes, {
     maxArrayLength: 500,

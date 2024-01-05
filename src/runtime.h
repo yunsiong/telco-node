@@ -1,12 +1,12 @@
-#ifndef FRIDANODE_RUNTIME_H
-#define FRIDANODE_RUNTIME_H
+#ifndef TELCONODE_RUNTIME_H
+#define TELCONODE_RUNTIME_H
 
 #include "glib_context.h"
 #include "uv_context.h"
 
 #include <v8.h>
 
-namespace frida {
+namespace telco {
 
 class Runtime {
  public:

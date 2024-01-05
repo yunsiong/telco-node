@@ -1,8 +1,8 @@
-const frida = require('..');
+const telco = require('..');
 const { inspect } = require('util');
 
 async function main() {
-  const device = await frida.getUsbDevice();
+  const device = await telco.getUsbDevice();
   const applications = await device.enumerateApplications({ scope: 'full' });
   console.log('[*] Applications:', inspect(applications, {
     maxArrayLength: 500,

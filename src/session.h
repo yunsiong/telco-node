@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_SESSION_H
-#define FRIDANODE_SESSION_H
+#ifndef TELCONODE_SESSION_H
+#define TELCONODE_SESSION_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Session : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class Session : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  explicit Session(FridaSession* handle, Runtime* runtime);
+  explicit Session(TelcoSession* handle, Runtime* runtime);
   ~Session();
 
   static NAN_METHOD(New);

@@ -1,8 +1,8 @@
-const frida = require('..');
+const telco = require('..');
 const util = require('util');
 
 async function main() {
-  const device = await frida.getDevice('xyz:lockdown');
+  const device = await telco.getDevice('xyz:lockdown');
 
   console.log('Getting channel...');
   // const channel = await device.openChannel('tcp:1234');

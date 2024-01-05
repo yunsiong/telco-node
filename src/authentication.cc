@@ -1,6 +1,6 @@
 #include "authentication.h"
 
-using frida::Runtime;
+using telco::Runtime;
 using v8::External;
 using v8::Function;
 using v8::Isolate;
@@ -10,63 +10,63 @@ using v8::Persistent;
 using v8::String;
 using v8::Value;
 
-struct _FridaNodeAuthenticationService {
+struct _TelcoNodeAuthenticationService {
   GObject parent;
   Persistent<Function>* callback;
   Runtime* runtime;
 };
 
-static void frida_node_authentication_service_iface_init(gpointer g_iface,
+static void telco_node_authentication_service_iface_init(gpointer g_iface,
     gpointer iface_data);
-static void frida_node_authentication_service_dispose(GObject* object);
-static void frida_node_authentication_service_authenticate(
-    FridaAuthenticationService* service, const gchar* token,
+static void telco_node_authentication_service_dispose(GObject* object);
+static void telco_node_authentication_service_authenticate(
+    TelcoAuthenticationService* service, const gchar* token,
     GCancellable* cancellable, GAsyncReadyCallback callback,
     gpointer user_data);
-static gchar* frida_node_authentication_service_authenticate_finish(
-    FridaAuthenticationService* service, GAsyncResult* result, GError** error);
+static gchar* telco_node_authentication_service_authenticate_finish(
+    TelcoAuthenticationService* service, GAsyncResult* result, GError** error);
 
 G_DEFINE_TYPE_EXTENDED(
-    FridaNodeAuthenticationService,
-    frida_node_authentication_service,
+    TelcoNodeAuthenticationService,
+    telco_node_authentication_service,
     G_TYPE_OBJECT,
     0,
-    G_IMPLEMENT_INTERFACE(FRIDA_TYPE_AUTHENTICATION_SERVICE,
-      frida_node_authentication_service_iface_init))
+    G_IMPLEMENT_INTERFACE(TELCO_TYPE_AUTHENTICATION_SERVICE,
+      telco_node_authentication_service_iface_init))
 
-FridaAuthenticationService* frida_node_authentication_service_new(
+TelcoAuthenticationService* telco_node_authentication_service_new(
     Local<Function> callback, Runtime* runtime) {
-  auto service = static_cast<FridaNodeAuthenticationService*>(
-      g_object_new(FRIDA_TYPE_NODE_AUTHENTICATION_SERVICE, NULL));
+  auto service = static_cast<TelcoNodeAuthenticationService*>(
+      g_object_new(TELCO_TYPE_NODE_AUTHENTICATION_SERVICE, NULL));
   service->callback = new Persistent<Function>(Isolate::GetCurrent(), callback);
   service->runtime = runtime;
-  return FRIDA_AUTHENTICATION_SERVICE(service);
+  return TELCO_AUTHENTICATION_SERVICE(service);
 }
 
-static void frida_node_authentication_service_class_init(
-    FridaNodeAuthenticationServiceClass* klass)
+static void telco_node_authentication_service_class_init(
+    TelcoNodeAuthenticationServiceClass* klass)
 {
   GObjectClass* object_class = G_OBJECT_CLASS(klass);
 
-  object_class->dispose = frida_node_authentication_service_dispose;
+  object_class->dispose = telco_node_authentication_service_dispose;
 }
 
-static void frida_node_authentication_service_iface_init(gpointer g_iface,
+static void telco_node_authentication_service_iface_init(gpointer g_iface,
     gpointer iface_data) {
-  auto iface = static_cast<FridaAuthenticationServiceIface*>(g_iface);
+  auto iface = static_cast<TelcoAuthenticationServiceIface*>(g_iface);
 
   iface->authenticate =
-      frida_node_authentication_service_authenticate;
+      telco_node_authentication_service_authenticate;
   iface->authenticate_finish =
-      frida_node_authentication_service_authenticate_finish;
+      telco_node_authentication_service_authenticate_finish;
 }
 
-static void frida_node_authentication_service_init(
-    FridaNodeAuthenticationService* self) {
+static void telco_node_authentication_service_init(
+    TelcoNodeAuthenticationService* self) {
 }
 
-static void frida_node_authentication_service_dispose(GObject* object) {
-  auto self = FRIDA_NODE_AUTHENTICATION_SERVICE(object);
+static void telco_node_authentication_service_dispose(GObject* object) {
+  auto self = TELCO_NODE_AUTHENTICATION_SERVICE(object);
 
   Persistent<Function>* callback = self->callback;
   if (callback != NULL) {
@@ -76,13 +76,13 @@ static void frida_node_authentication_service_dispose(GObject* object) {
     });
   }
 
-  G_OBJECT_CLASS(frida_node_authentication_service_parent_class)->dispose(
+  G_OBJECT_CLASS(telco_node_authentication_service_parent_class)->dispose(
       object);
 }
 
 static NAN_METHOD(OnAuthenticationSuccess) {
   auto task = static_cast<GTask*>(info.Data().As<External>()->Value ());
-  auto self = static_cast<FridaNodeAuthenticationService*>(
+  auto self = static_cast<TelcoNodeAuthenticationService*>(
       g_task_get_source_object(task));
 
   gchar* session_info = NULL;
@@ -98,7 +98,7 @@ static NAN_METHOD(OnAuthenticationSuccess) {
   if (session_info != NULL) {
     g_task_return_pointer(task, session_info, g_free);
   } else {
-    g_task_return_new_error(task, FRIDA_ERROR, FRIDA_ERROR_INVALID_ARGUMENT,
+    g_task_return_new_error(task, TELCO_ERROR, TELCO_ERROR_INVALID_ARGUMENT,
         "Internal error");
   }
 
@@ -119,17 +119,17 @@ static NAN_METHOD(OnAuthenticationFailure) {
   }
 
   Nan::Utf8String str(message);
-  g_task_return_new_error(task, FRIDA_ERROR, FRIDA_ERROR_INVALID_ARGUMENT,
+  g_task_return_new_error(task, TELCO_ERROR, TELCO_ERROR_INVALID_ARGUMENT,
       "%s", *str);
 
   g_object_unref(task);
 }
 
-static void frida_node_authentication_service_authenticate(
-    FridaAuthenticationService* service, const gchar* token,
+static void telco_node_authentication_service_authenticate(
+    TelcoAuthenticationService* service, const gchar* token,
     GCancellable* cancellable, GAsyncReadyCallback callback,
     gpointer user_data) {
-  auto self = FRIDA_NODE_AUTHENTICATION_SERVICE(service);
+  auto self = TELCO_NODE_AUTHENTICATION_SERVICE(service);
 
   auto task = g_task_new(self, cancellable, callback, user_data);
   g_task_set_task_data(task, g_strdup(token), g_free);
@@ -161,14 +161,14 @@ static void frida_node_authentication_service_authenticate(
     }
 
     if (!scheduled) {
-      g_task_return_new_error(task, FRIDA_ERROR, FRIDA_ERROR_INVALID_ARGUMENT,
+      g_task_return_new_error(task, TELCO_ERROR, TELCO_ERROR_INVALID_ARGUMENT,
           "Internal error");
       g_object_unref(task);
     }
   });
 }
 
-static gchar* frida_node_authentication_service_authenticate_finish(
-    FridaAuthenticationService* service, GAsyncResult* result, GError** error) {
+static gchar* telco_node_authentication_service_authenticate_finish(
+    TelcoAuthenticationService* service, GAsyncResult* result, GError** error) {
   return static_cast<gchar*>(g_task_propagate_pointer(G_TASK(result), error));
 }

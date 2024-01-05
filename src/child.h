@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_CHILD_H
-#define FRIDANODE_CHILD_H
+#ifndef TELCONODE_CHILD_H
+#define TELCONODE_CHILD_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Child : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class Child : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  explicit Child(FridaChild* handle, Runtime* runtime);
+  explicit Child(TelcoChild* handle, Runtime* runtime);
   ~Child();
 
   static NAN_METHOD(New);

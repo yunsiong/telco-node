@@ -15,10 +15,10 @@ using v8::Object;
 using v8::Value;
 using Nan::HandleScope;
 
-namespace frida {
+namespace telco {
 
 UVContext::UVContext(uv_loop_t* loop)
-    : usage_count_(0), async_(new uv_async_t), async_resource_("frida"),
+    : usage_count_(0), async_(new uv_async_t), async_resource_("telco"),
       pending_(NULL) {
   async_->data = this;
   uv_async_init(loop, async_, ProcessPendingWrapper);

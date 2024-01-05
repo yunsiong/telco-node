@@ -17,9 +17,9 @@ using v8::ReadOnly;
 using v8::String;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-Process::Process(FridaProcess* handle, Runtime* runtime)
+Process::Process(TelcoProcess* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
@@ -71,7 +71,7 @@ NAN_METHOD(Process::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaProcess*>(
+  auto handle = static_cast<TelcoProcess*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new Process(handle, runtime);
   auto obj = info.This();
@@ -82,24 +82,24 @@ NAN_METHOD(Process::New) {
 
 NAN_PROPERTY_GETTER(Process::GetPid) {
   auto handle = ObjectWrap::Unwrap<Process>(
-      info.Holder())->GetHandle<FridaProcess>();
+      info.Holder())->GetHandle<TelcoProcess>();
 
-  info.GetReturnValue().Set(Nan::New<Integer>(frida_process_get_pid(handle)));
+  info.GetReturnValue().Set(Nan::New<Integer>(telco_process_get_pid(handle)));
 }
 
 NAN_PROPERTY_GETTER(Process::GetName) {
   auto handle = ObjectWrap::Unwrap<Process>(
-      info.Holder())->GetHandle<FridaProcess>();
+      info.Holder())->GetHandle<TelcoProcess>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_process_get_name(handle)).ToLocalChecked());
+      Nan::New(telco_process_get_name(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Process::GetParameters) {
   auto wrapper = ObjectWrap::Unwrap<Process>(info.Holder());
-  auto handle = wrapper->GetHandle<FridaProcess>();
+  auto handle = wrapper->GetHandle<TelcoProcess>();
 
-  GHashTable* parameters = frida_process_get_parameters(handle);
+  GHashTable* parameters = telco_process_get_parameters(handle);
   info.GetReturnValue().Set(ParseParameters(parameters));
 }
 

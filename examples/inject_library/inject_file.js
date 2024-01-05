@@ -6,14 +6,14 @@
  * $ node inject_file.js Twitter ~/.Trash/example.dylib
  */
 
-const frida = require('../..');
+const telco = require('../..');
 
 const [ target, libraryPath ] = process.argv.slice(2);
 
 let device = null;
 
 async function main() {
-  device = await frida.getLocalDevice();
+  device = await telco.getLocalDevice();
   device.uninjected.connect(onUninjected);
 
   try {

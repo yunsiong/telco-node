@@ -18,7 +18,7 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
 Runtime::Runtime(UVContext* uv_context, GLibContext* glib_context)
   : uv_context_(uv_context),
@@ -417,7 +417,7 @@ bool Runtime::ValueToCertificate(Local<Value> value,
 }
 
 const char* Runtime::ClassNameFromC(const char* cname) {
-  if (g_str_has_prefix(cname, "Frida"))
+  if (g_str_has_prefix(cname, "Telco"))
     return cname + 5;
 
   return cname;

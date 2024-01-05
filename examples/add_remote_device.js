@@ -1,7 +1,7 @@
-const frida = require('..');
+const telco = require('..');
 
 async function main() {
-  const deviceManager = frida.getDeviceManager();
+  const deviceManager = telco.getDeviceManager();
 
   const device = await deviceManager.addRemoteDevice('127.0.0.1:1337', {
     certificate: '/Users/oleavr/src/cert.pem',

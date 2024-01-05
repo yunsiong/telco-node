@@ -12,15 +12,15 @@ using v8::Object;
 using v8::Persistent;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-PortalMembership::PortalMembership(FridaPortalMembership* handle, Runtime* runtime)
+PortalMembership::PortalMembership(TelcoPortalMembership* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
 
 PortalMembership::~PortalMembership() {
-  frida_unref(handle_);
+  telco_unref(handle_);
 }
 
 void PortalMembership::Init(Local<Object> exports, Runtime* runtime) {
@@ -59,7 +59,7 @@ NAN_METHOD(PortalMembership::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaPortalMembership*>(
+  auto handle = static_cast<TelcoPortalMembership*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new PortalMembership(handle, runtime);
   auto obj = info.This();
@@ -70,14 +70,14 @@ NAN_METHOD(PortalMembership::New) {
 
 namespace {
 
-class TerminateOperation : public Operation<FridaPortalMembership> {
+class TerminateOperation : public Operation<TelcoPortalMembership> {
  protected:
   void Begin() {
-    frida_portal_membership_terminate(handle_, cancellable_, OnReady, this);
+    telco_portal_membership_terminate(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_portal_membership_terminate_finish(handle_, result, error);
+    telco_portal_membership_terminate_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {

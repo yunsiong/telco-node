@@ -17,9 +17,9 @@ using v8::ReadOnly;
 using v8::String;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-Application::Application(FridaApplication* handle, Runtime* runtime)
+Application::Application(TelcoApplication* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
@@ -74,7 +74,7 @@ NAN_METHOD(Application::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaApplication*>(
+  auto handle = static_cast<TelcoApplication*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new Application(handle, runtime);
   auto obj = info.This();
@@ -85,34 +85,34 @@ NAN_METHOD(Application::New) {
 
 NAN_PROPERTY_GETTER(Application::GetIdentifier) {
   auto handle = ObjectWrap::Unwrap<Application>(
-      info.Holder())->GetHandle<FridaApplication>();
+      info.Holder())->GetHandle<TelcoApplication>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_application_get_identifier(handle)).ToLocalChecked());
+      Nan::New(telco_application_get_identifier(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Application::GetName) {
   auto handle = ObjectWrap::Unwrap<Application>(
-      info.Holder())->GetHandle<FridaApplication>();
+      info.Holder())->GetHandle<TelcoApplication>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_application_get_name(handle)).ToLocalChecked());
+      Nan::New(telco_application_get_name(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Application::GetPid) {
   auto isolate = info.GetIsolate();
   auto handle = ObjectWrap::Unwrap<Application>(
-      info.Holder())->GetHandle<FridaApplication>();
+      info.Holder())->GetHandle<TelcoApplication>();
 
   info.GetReturnValue().Set(
-      Integer::NewFromUnsigned(isolate, frida_application_get_pid(handle)));
+      Integer::NewFromUnsigned(isolate, telco_application_get_pid(handle)));
 }
 
 NAN_PROPERTY_GETTER(Application::GetParameters) {
   auto wrapper = ObjectWrap::Unwrap<Application>(info.Holder());
-  auto handle = wrapper->GetHandle<FridaApplication>();
+  auto handle = wrapper->GetHandle<TelcoApplication>();
 
-  GHashTable* parameters = frida_application_get_parameters(handle);
+  GHashTable* parameters = telco_application_get_parameters(handle);
   info.GetReturnValue().Set(ParseParameters(parameters));
 }
 

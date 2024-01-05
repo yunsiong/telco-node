@@ -13,9 +13,9 @@ using v8::Persistent;
 using v8::ReadOnly;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-Child::Child(FridaChild* handle, Runtime* runtime)
+Child::Child(TelcoChild* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
@@ -75,7 +75,7 @@ NAN_METHOD(Child::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaChild*>(
+  auto handle = static_cast<TelcoChild*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new Child(handle, runtime);
   auto obj = info.This();
@@ -86,32 +86,32 @@ NAN_METHOD(Child::New) {
 
 NAN_PROPERTY_GETTER(Child::GetPid) {
   auto handle = ObjectWrap::Unwrap<Child>(
-      info.Holder())->GetHandle<FridaChild>();
+      info.Holder())->GetHandle<TelcoChild>();
 
-  info.GetReturnValue().Set(Nan::New<Integer>(frida_child_get_pid(handle)));
+  info.GetReturnValue().Set(Nan::New<Integer>(telco_child_get_pid(handle)));
 }
 
 NAN_PROPERTY_GETTER(Child::GetParentPid) {
   auto handle = ObjectWrap::Unwrap<Child>(
-      info.Holder())->GetHandle<FridaChild>();
+      info.Holder())->GetHandle<TelcoChild>();
 
   info.GetReturnValue().Set(
-      Nan::New<Integer>(frida_child_get_parent_pid(handle)));
+      Nan::New<Integer>(telco_child_get_parent_pid(handle)));
 }
 
 NAN_PROPERTY_GETTER(Child::GetOrigin) {
   auto handle = ObjectWrap::Unwrap<Child>(
-      info.Holder())->GetHandle<FridaChild>();
+      info.Holder())->GetHandle<TelcoChild>();
 
   info.GetReturnValue().Set(Runtime::ValueFromEnum(
-      frida_child_get_origin(handle), FRIDA_TYPE_CHILD_ORIGIN));
+      telco_child_get_origin(handle), TELCO_TYPE_CHILD_ORIGIN));
 }
 
 NAN_PROPERTY_GETTER(Child::GetIdentifier) {
   auto handle = ObjectWrap::Unwrap<Child>(
-      info.Holder())->GetHandle<FridaChild>();
+      info.Holder())->GetHandle<TelcoChild>();
 
-  auto identifier = frida_child_get_identifier(handle);
+  auto identifier = telco_child_get_identifier(handle);
   if (identifier != NULL)
     info.GetReturnValue().Set(Nan::New(identifier).ToLocalChecked());
   else
@@ -120,9 +120,9 @@ NAN_PROPERTY_GETTER(Child::GetIdentifier) {
 
 NAN_PROPERTY_GETTER(Child::GetPath) {
   auto handle = ObjectWrap::Unwrap<Child>(
-      info.Holder())->GetHandle<FridaChild>();
+      info.Holder())->GetHandle<TelcoChild>();
 
-  auto path = frida_child_get_path(handle);
+  auto path = telco_child_get_path(handle);
   if (path != NULL)
     info.GetReturnValue().Set(Nan::New(path).ToLocalChecked());
   else
@@ -131,19 +131,19 @@ NAN_PROPERTY_GETTER(Child::GetPath) {
 
 NAN_PROPERTY_GETTER(Child::GetArgv) {
   auto handle = ObjectWrap::Unwrap<Child>(
-      info.Holder())->GetHandle<FridaChild>();
+      info.Holder())->GetHandle<TelcoChild>();
 
   gint length;
-  auto argv = frida_child_get_argv(handle, &length);
+  auto argv = telco_child_get_argv(handle, &length);
   info.GetReturnValue().Set(Runtime::ValueFromStrv(argv, length));
 }
 
 NAN_PROPERTY_GETTER(Child::GetEnvp) {
   auto handle = ObjectWrap::Unwrap<Child>(
-      info.Holder())->GetHandle<FridaChild>();
+      info.Holder())->GetHandle<TelcoChild>();
 
   gint length;
-  auto envp = frida_child_get_envp(handle, &length);
+  auto envp = telco_child_get_envp(handle, &length);
   info.GetReturnValue().Set(Runtime::ValueFromEnvp(envp, length));
 }
 

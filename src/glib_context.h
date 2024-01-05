@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_GLIB_CONTEXT_H
-#define FRIDANODE_GLIB_CONTEXT_H
+#ifndef TELCONODE_GLIB_CONTEXT_H
+#define TELCONODE_GLIB_CONTEXT_H
 
-#include <frida-core.h>
+#include <telco-core.h>
 
 #include <functional>
 
-namespace frida {
+namespace telco {
 
 class GLibContext {
 public:

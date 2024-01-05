@@ -16,9 +16,9 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-DeviceManager::DeviceManager(FridaDeviceManager* handle, Runtime* runtime)
+DeviceManager::DeviceManager(TelcoDeviceManager* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 
@@ -32,7 +32,7 @@ DeviceManager::~DeviceManager() {
       static_cast<GSList*>(
       runtime_->GetDataPointer(DEVICE_MANAGER_DATA_WRAPPERS)), this));
 
-  frida_unref(handle_);
+  telco_unref(handle_);
 }
 
 void DeviceManager::Init(Local<Object> exports, Runtime* runtime) {
@@ -53,7 +53,7 @@ void DeviceManager::Dispose(Runtime* runtime) {
       runtime->GetDataPointer(DEVICE_MANAGER_DATA_WRAPPERS));
   while (wrappers != NULL) {
     auto wrapper = static_cast<DeviceManager*>(wrappers->data);
-    frida_device_manager_close_sync(wrapper->GetHandle<FridaDeviceManager>(),
+    telco_device_manager_close_sync(wrapper->GetHandle<TelcoDeviceManager>(),
         NULL, NULL);
     wrappers = g_slist_delete_link(wrappers, wrappers);
   }
@@ -68,7 +68,7 @@ NAN_METHOD(DeviceManager::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = frida_device_manager_new();
+  auto handle = telco_device_manager_new();
 
   auto wrapper = new DeviceManager(handle, runtime);
   auto obj = info.This();
@@ -89,14 +89,14 @@ NAN_METHOD(DeviceManager::New) {
 
 namespace {
 
-class CloseOperation : public Operation<FridaDeviceManager> {
+class CloseOperation : public Operation<TelcoDeviceManager> {
  protected:
   void Begin() {
-    frida_device_manager_close(handle_, cancellable_, OnReady, this);
+    telco_device_manager_close(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_device_manager_close_finish(handle_, result, error);
+    telco_device_manager_close_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -118,35 +118,35 @@ NAN_METHOD(DeviceManager::Close) {
 
 namespace {
 
-class EnumerateDevicesOperation : public Operation<FridaDeviceManager> {
+class EnumerateDevicesOperation : public Operation<TelcoDeviceManager> {
  protected:
   void Begin() {
-    frida_device_manager_enumerate_devices(handle_, cancellable_, OnReady,
+    telco_device_manager_enumerate_devices(handle_, cancellable_, OnReady,
         this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    devices_ = frida_device_manager_enumerate_devices_finish(handle_, result,
+    devices_ = telco_device_manager_enumerate_devices_finish(handle_, result,
         error);
   }
 
   Local<Value> Result(Isolate* isolate) {
-    auto size = frida_device_list_size(devices_);
+    auto size = telco_device_list_size(devices_);
     Local<Array> devices = Nan::New<Array>(size);
     for (auto i = 0; i != size; i++) {
-      auto handle = frida_device_list_get(devices_, i);
+      auto handle = telco_device_list_get(devices_, i);
       auto device = Device::New(handle, runtime_);
       Nan::Set(devices, i, device);
       g_object_unref(handle);
     }
 
-    frida_unref(devices_);
+    telco_unref(devices_);
 
     return devices;
   }
 
  private:
-  FridaDeviceList* devices_;
+  TelcoDeviceList* devices_;
 };
 
 }
@@ -163,9 +163,9 @@ NAN_METHOD(DeviceManager::EnumerateDevices) {
 
 namespace {
 
-class AddRemoteDeviceOperation : public Operation<FridaDeviceManager> {
+class AddRemoteDeviceOperation : public Operation<TelcoDeviceManager> {
  public:
-  AddRemoteDeviceOperation(gchar* address, FridaRemoteDeviceOptions* options)
+  AddRemoteDeviceOperation(gchar* address, TelcoRemoteDeviceOptions* options)
     : address_(address),
       options_(options) {
   }
@@ -177,12 +177,12 @@ class AddRemoteDeviceOperation : public Operation<FridaDeviceManager> {
 
  protected:
   void Begin() {
-    frida_device_manager_add_remote_device(handle_, address_, options_,
+    telco_device_manager_add_remote_device(handle_, address_, options_,
         cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    device_ = frida_device_manager_add_remote_device_finish(handle_, result,
+    device_ = telco_device_manager_add_remote_device_finish(handle_, result,
         error);
   }
 
@@ -194,8 +194,8 @@ class AddRemoteDeviceOperation : public Operation<FridaDeviceManager> {
 
  private:
   gchar* address_;
-  FridaRemoteDeviceOptions* options_;
-  FridaDevice* device_;
+  TelcoRemoteDeviceOptions* options_;
+  TelcoDevice* device_;
 };
 
 }
@@ -221,14 +221,14 @@ NAN_METHOD(DeviceManager::AddRemoteDevice) {
   }
   Nan::Utf8String address(address_value);
 
-  auto options = frida_remote_device_options_new();
+  auto options = telco_remote_device_options_new();
   bool valid = true;
 
   if (!certificate_value->IsNull()) {
     GTlsCertificate* certificate;
     valid = Runtime::ValueToCertificate(certificate_value, &certificate);
     if (valid) {
-      frida_remote_device_options_set_certificate(options, certificate);
+      telco_remote_device_options_set_certificate(options, certificate);
       g_object_unref(certificate);
     }
   }
@@ -236,7 +236,7 @@ NAN_METHOD(DeviceManager::AddRemoteDevice) {
   if (valid && !origin_value->IsNull()) {
     if (origin_value->IsString()) {
       Nan::Utf8String origin(origin_value);
-      frida_remote_device_options_set_origin(options, *origin);
+      telco_remote_device_options_set_origin(options, *origin);
     } else {
       Nan::ThrowTypeError("Bad argument, 'origin' must be a string");
       valid = false;
@@ -246,7 +246,7 @@ NAN_METHOD(DeviceManager::AddRemoteDevice) {
   if (valid && !token_value->IsNull()) {
     if (token_value->IsString()) {
       Nan::Utf8String token(token_value);
-      frida_remote_device_options_set_token(options, *token);
+      telco_remote_device_options_set_token(options, *token);
     } else {
       Nan::ThrowTypeError("Bad argument, 'token' must be a string");
       valid = false;
@@ -258,7 +258,7 @@ NAN_METHOD(DeviceManager::AddRemoteDevice) {
       auto keepalive_interval =
           Nan::To<int32_t>(keepalive_interval_value).FromMaybe(-1);
       if (keepalive_interval >= -1) {
-        frida_remote_device_options_set_keepalive_interval(options,
+        telco_remote_device_options_set_keepalive_interval(options,
             keepalive_interval);
       } else {
         Nan::ThrowTypeError("Bad argument, invalid 'keepaliveInterval'");
@@ -283,7 +283,7 @@ NAN_METHOD(DeviceManager::AddRemoteDevice) {
 
 namespace {
 
-class RemoveRemoteDeviceOperation : public Operation<FridaDeviceManager> {
+class RemoveRemoteDeviceOperation : public Operation<TelcoDeviceManager> {
  public:
   RemoveRemoteDeviceOperation(gchar* address) : address_(address) {
   }
@@ -294,12 +294,12 @@ class RemoveRemoteDeviceOperation : public Operation<FridaDeviceManager> {
 
  protected:
   void Begin() {
-    frida_device_manager_remove_remote_device(handle_, address_, cancellable_,
+    telco_device_manager_remove_remote_device(handle_, address_, cancellable_,
         OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_device_manager_remove_remote_device_finish(handle_, result, error);
+    telco_device_manager_remove_remote_device_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {

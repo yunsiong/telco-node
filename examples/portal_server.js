@@ -1,12 +1,12 @@
 const crypto = require('crypto');
-const frida = require('..');
+const telco = require('..');
 const readline = require('readline');
 
 const ENABLE_CONTROL_INTERFACE = true;
 
 class Application {
   constructor() {
-    const clusterParams = new frida.EndpointParameters({
+    const clusterParams = new telco.EndpointParameters({
       address: 'unix:/Users/oleavr/src/cluster',
       certificate: '/Users/oleavr/src/identity2.pem',
       authentication: {
@@ -17,18 +17,18 @@ class Application {
 
     let controlParams = null;
     if (ENABLE_CONTROL_INTERFACE) {
-      controlParams = new frida.EndpointParameters({
+      controlParams = new telco.EndpointParameters({
         address: '::1',
         port: 27042,
         authentication: {
           scheme: 'callback',
           callback: this._authenticate
         },
-        assetRoot: '/Users/oleavr/src/frida/frida-python/examples/web_client/dist'
+        assetRoot: '/Users/oleavr/src/telco/telco-python/examples/web_client/dist'
       });
     }
 
-    const service = new frida.PortalService({ clusterParams, controlParams });
+    const service = new telco.PortalService({ clusterParams, controlParams });
     this._service = service;
     this._device = service.device;
     this._peers = new Map();

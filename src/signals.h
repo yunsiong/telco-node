@@ -1,9 +1,9 @@
-#ifndef FRIDANODE_SIGNALS_H
-#define FRIDANODE_SIGNALS_H
+#ifndef TELCONODE_SIGNALS_H
+#define TELCONODE_SIGNALS_H
 
 #include "glib_object.h"
 
-namespace frida {
+namespace telco {
 
 class Signals : public GLibObject {
  public:

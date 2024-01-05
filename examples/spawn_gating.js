@@ -1,11 +1,11 @@
-const frida = require('..');
+const telco = require('..');
 const fs = require('fs').promises;
 
 let device = null;
 let tracers = [];
 
 async function main() {
-  device = await frida.getUsbDevice();
+  device = await telco.getUsbDevice();
   device.spawnAdded.connect(onSpawnAdded);
 
   console.log('[*] Enabling spawn gating');

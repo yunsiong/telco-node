@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_PORTAL_MEMBERSHIP_H
-#define FRIDANODE_PORTAL_MEMBERSHIP_H
+#ifndef TELCONODE_PORTAL_MEMBERSHIP_H
+#define TELCONODE_PORTAL_MEMBERSHIP_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class PortalMembership : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class PortalMembership : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  explicit PortalMembership(FridaPortalMembership* handle, Runtime* runtime);
+  explicit PortalMembership(TelcoPortalMembership* handle, Runtime* runtime);
   ~PortalMembership();
 
   static NAN_METHOD(New);

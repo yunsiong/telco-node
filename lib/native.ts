@@ -1,7 +1,7 @@
 import * as bindings from "bindings";
 
 export const binding = bindings({
-    bindings: "frida_binding",
+    bindings: "telco_binding",
     try: [
         ["module_root", "build", "bindings"],
         ["module_root", "build", "Debug", "bindings"],

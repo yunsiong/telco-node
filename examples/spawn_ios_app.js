@@ -1,4 +1,4 @@
-const frida = require('..');
+const telco = require('..');
 
 const current = {
   device: null,
@@ -10,13 +10,13 @@ async function main() {
   process.on('SIGTERM', stop);
   process.on('SIGINT', stop);
 
-  const device = await frida.getUsbDevice();
+  const device = await telco.getUsbDevice();
   current.device = device;
   device.output.connect(onOutput);
 
   console.log('[*] spawn()');
   const pid = await device.spawn('com.atebits.Tweetie2', {
-    url: 'twitter://user?screen_name=fridadotre',
+    url: 'twitter://user?screen_name=telcodotre',
     env: {
       'OS_ACTIVITY_DT_MODE': 'YES',
       'NSUnbufferedIO': 'YES'

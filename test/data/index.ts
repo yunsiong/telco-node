@@ -5,8 +5,8 @@ export function targetProgram() {
     } else if (platform === "darwin") {
         return __dirname + "/unixvictim-macos";
     } else if (platform === "linux" && ["ia32", "x64"].includes(process.arch)) {
-        const fridaArch = (process.arch === "x64") ? "x86_64" : "x86";
-        return __dirname + "/unixvictim-linux-" + fridaArch;
+        const telcoArch = (process.arch === "x64") ? "x86_64" : "x86";
+        return __dirname + "/unixvictim-linux-" + telcoArch;
     } else {
         return "/bin/cat";
     }

@@ -1,8 +1,8 @@
 {
-  "name": "frida",
+  "name": "telco",
   "version": "0.0.0",
   "authors": [
-    "Frida Developers"
+    "Telco Developers"
   ],
   "description": "Inject JavaScript to explore native apps on Windows, Mac, Linux, iOS and Android",
   "keywords": [
@@ -19,7 +19,7 @@
     "ipad",
     "android"
   ],
-  "homepage": "https://frida.re",
+  "homepage": "https://telco.re",
   "engines": {
     "node": ">=8.0.0"
   },
@@ -53,14 +53,14 @@
   },
   "binary": {
     "host": "https://github.com",
-    "remote_path": "frida/frida/releases/download/{version}"
+    "remote_path": "telco/telco/releases/download/{version}"
   },
   "license": "LGPL-2.0 WITH WxWindows-exception-3.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/frida/frida-node.git"
+    "url": "https://github.com/telco/telco-node.git"
   },
   "bugs": {
-    "url": "https://github.com/frida/frida-node/issues"
+    "url": "https://github.com/telco/telco-node/issues"
   }
 }

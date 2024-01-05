@@ -12,9 +12,9 @@ using v8::Persistent;
 using v8::ReadOnly;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-Relay::Relay(FridaRelay* handle, Runtime* runtime)
+Relay::Relay(TelcoRelay* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
@@ -46,7 +46,7 @@ void Relay::Init(Local<Object> exports, Runtime* runtime) {
       new Persistent<FunctionTemplate>(isolate, tpl));
 }
 
-FridaRelay* Relay::TryParse(Local<Value> value, Runtime* runtime) {
+TelcoRelay* Relay::TryParse(Local<Value> value, Runtime* runtime) {
   if (!value->IsObject())
     return NULL;
 
@@ -55,7 +55,7 @@ FridaRelay* Relay::TryParse(Local<Value> value, Runtime* runtime) {
   if (!HasInstance(impl, runtime))
     return NULL;
 
-  return ObjectWrap::Unwrap<Relay>(impl.As<Object>())->GetHandle<FridaRelay>();
+  return ObjectWrap::Unwrap<Relay>(impl.As<Object>())->GetHandle<TelcoRelay>();
 }
 
 bool Relay::HasInstance(Local<Value> value, Runtime* runtime) {
@@ -89,13 +89,13 @@ NAN_METHOD(Relay::New) {
   Nan::Utf8String username(username_value);
   Nan::Utf8String password(password_value);
 
-  FridaRelayKind kind;
-  if (!Runtime::ValueToEnum(info[3], FRIDA_TYPE_RELAY_KIND, &kind))
+  TelcoRelayKind kind;
+  if (!Runtime::ValueToEnum(info[3], TELCO_TYPE_RELAY_KIND, &kind))
     return;
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = frida_relay_new(*address, *username, *password, kind);
+  auto handle = telco_relay_new(*address, *username, *password, kind);
   auto wrapper = new Relay(handle, runtime);
   g_object_unref(handle);
   auto obj = info.This();
@@ -106,34 +106,34 @@ NAN_METHOD(Relay::New) {
 
 NAN_PROPERTY_GETTER(Relay::GetAddress) {
   auto handle = ObjectWrap::Unwrap<Relay>(
-      info.Holder())->GetHandle<FridaRelay>();
+      info.Holder())->GetHandle<TelcoRelay>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_relay_get_address(handle)).ToLocalChecked());
+      Nan::New(telco_relay_get_address(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Relay::GetUsername) {
   auto handle = ObjectWrap::Unwrap<Relay>(
-      info.Holder())->GetHandle<FridaRelay>();
+      info.Holder())->GetHandle<TelcoRelay>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_relay_get_username(handle)).ToLocalChecked());
+      Nan::New(telco_relay_get_username(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Relay::GetPassword) {
   auto handle = ObjectWrap::Unwrap<Relay>(
-      info.Holder())->GetHandle<FridaRelay>();
+      info.Holder())->GetHandle<TelcoRelay>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_relay_get_password(handle)).ToLocalChecked());
+      Nan::New(telco_relay_get_password(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Relay::GetKind) {
   auto handle = ObjectWrap::Unwrap<Relay>(
-      info.Holder())->GetHandle<FridaRelay>();
+      info.Holder())->GetHandle<TelcoRelay>();
 
   info.GetReturnValue().Set(Runtime::ValueFromEnum(
-      frida_relay_get_kind(handle), FRIDA_TYPE_RELAY_KIND));
+      telco_relay_get_kind(handle), TELCO_TYPE_RELAY_KIND));
 }
 
 }

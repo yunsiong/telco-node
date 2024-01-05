@@ -2,37 +2,37 @@
   "variables": {
     "conditions": [
       ["OS=='win'", {
-        "frida_host": "windows",
+        "telco_host": "windows",
       }],
       ["OS=='mac' and target_arch=='ia32'", {
-        "frida_host": "macos-x86",
+        "telco_host": "macos-x86",
       }],
       ["OS=='mac' and target_arch=='x64'", {
-        "frida_host": "macos-x86_64",
+        "telco_host": "macos-x86_64",
       }],
       ["OS=='mac' and target_arch=='arm64'", {
-        "frida_host": "macos-arm64",
+        "telco_host": "macos-arm64",
       }],
       ["OS=='linux' and target_arch=='ia32'", {
-        "frida_host": "linux-x86",
+        "telco_host": "linux-x86",
       }],
       ["OS=='linux' and target_arch=='x64'", {
-        "frida_host": "linux-x86_64",
+        "telco_host": "linux-x86_64",
       }],
       ["OS=='linux' and target_arch=='arm'", {
-        "frida_host": "linux-armhf",
+        "telco_host": "linux-armhf",
       }],
       ["OS=='linux' and target_arch=='arm64'", {
-        "frida_host": "linux-arm64",
+        "telco_host": "linux-arm64",
       }],
       ["OS=='freebsd' and target_arch=='x64'", {
-        "frida_host": "freebsd-x86_64",
+        "telco_host": "freebsd-x86_64",
       }],
       ["OS=='freebsd' and target_arch=='arm64'", {
-        "frida_host": "freebsd-arm64",
+        "telco_host": "freebsd-arm64",
       }],
     ],
-    "frida_host_msvs": "unix",
+    "telco_host_msvs": "unix",
     "build_v8_with_gn": 0,
     "openssl_fips": "",
   },
@@ -41,14 +41,14 @@
       "variables": {
         "conditions": [
           ["OS=='win' and target_arch=='ia32'", {
-            "frida_host_msvs": "Win32-<(CONFIGURATION_NAME)",
+            "telco_host_msvs": "Win32-<(CONFIGURATION_NAME)",
           }],
           ["OS=='win' and target_arch=='x64'", {
-            "frida_host_msvs": "x64-<(CONFIGURATION_NAME)",
+            "telco_host_msvs": "x64-<(CONFIGURATION_NAME)",
           }],
         ],
       },
-      "target_name": "frida_binding",
+      "target_name": "telco_binding",
       "sources": [
         "src/addon.cc",
         "src/device_manager.cc",
@@ -77,20 +77,20 @@
       "target_conditions": [
         ["OS=='win'", {
           "include_dirs": [
-            "$(FRIDA)/build/tmp-windows/<(frida_host_msvs)/frida-core/api",
-            "$(FRIDA)/build/sdk-windows/<(frida_host_msvs)/include/json-glib-1.0",
-            "$(FRIDA)/build/sdk-windows/<(frida_host_msvs)/include/gee-0.8",
-            "$(FRIDA)/build/sdk-windows/<(frida_host_msvs)/include/glib-2.0",
-            "$(FRIDA)/build/sdk-windows/<(frida_host_msvs)/lib/glib-2.0/include",
+            "$(TELCO)/build/tmp-windows/<(telco_host_msvs)/telco-core/api",
+            "$(TELCO)/build/sdk-windows/<(telco_host_msvs)/include/json-glib-1.0",
+            "$(TELCO)/build/sdk-windows/<(telco_host_msvs)/include/gee-0.8",
+            "$(TELCO)/build/sdk-windows/<(telco_host_msvs)/include/glib-2.0",
+            "$(TELCO)/build/sdk-windows/<(telco_host_msvs)/lib/glib-2.0/include",
             "<!(node -e \"require(\'nan\')\")",
           ],
           "library_dirs": [
-            "$(FRIDA)/build/tmp-windows/<(frida_host_msvs)/frida-core",
-            "$(FRIDA)/build/sdk-windows/<(frida_host_msvs)/lib",
-            "$(FRIDA)/build/sdk-windows/<(frida_host_msvs)/lib/gio/modules",
+            "$(TELCO)/build/tmp-windows/<(telco_host_msvs)/telco-core",
+            "$(TELCO)/build/sdk-windows/<(telco_host_msvs)/lib",
+            "$(TELCO)/build/sdk-windows/<(telco_host_msvs)/lib/gio/modules",
           ],
           "libraries": [
-            "-lfrida-core.lib",
+            "-ltelco-core.lib",
             "-llibquickjs.a",
             "-llibcapstone.a",
             "-llibsoup-3.0.a",
@@ -127,27 +127,27 @@
           ],
         }, {
           "include_dirs": [
-            "$(FRIDA)/build/frida-<(frida_host)/include/frida-1.0",
-            "$(FRIDA)/build/sdk-<(frida_host)/include/json-glib-1.0",
-            "$(FRIDA)/build/sdk-<(frida_host)/include/gio-unix-2.0",
-            "$(FRIDA)/build/sdk-<(frida_host)/include/glib-2.0",
-            "$(FRIDA)/build/sdk-<(frida_host)/lib/glib-2.0/include",
+            "$(TELCO)/build/telco-<(telco_host)/include/telco-1.0",
+            "$(TELCO)/build/sdk-<(telco_host)/include/json-glib-1.0",
+            "$(TELCO)/build/sdk-<(telco_host)/include/gio-unix-2.0",
+            "$(TELCO)/build/sdk-<(telco_host)/include/glib-2.0",
+            "$(TELCO)/build/sdk-<(telco_host)/lib/glib-2.0/include",
             "<!(node -e \"require(\'nan\')\")",
           ],
           "library_dirs": [
-            "$(FRIDA)/build/frida-<(frida_host)/lib",
-            "$(FRIDA)/build/sdk-<(frida_host)/lib",
-            "$(FRIDA)/build/sdk-<(frida_host)/lib/gio/modules",
+            "$(TELCO)/build/telco-<(telco_host)/lib",
+            "$(TELCO)/build/sdk-<(telco_host)/lib",
+            "$(TELCO)/build/sdk-<(telco_host)/lib/gio/modules",
           ],
           "libraries": [
-            "-lfrida-core-1.0",
-            "-lfrida-gumjs-1.0",
+            "-ltelco-core-1.0",
+            "-ltelco-gumjs-1.0",
             "-lsoup-3.0",
             "-lnghttp2",
             "-lsqlite3",
             "-lpsl",
             "-ljson-glib-1.0",
-            "-lfrida-gum-1.0",
+            "-ltelco-gum-1.0",
             "-lcapstone",
             "-lgee-0.8",
             "-lnice",
@@ -202,8 +202,8 @@
             "-Wl,../binding.version",
           ],
           "library_dirs": [
-            "$(FRIDA)/build/sdk-<(frida_host)/lib32",
-            "$(FRIDA)/build/sdk-<(frida_host)/lib64",
+            "$(TELCO)/build/sdk-<(telco_host)/lib32",
+            "$(TELCO)/build/sdk-<(telco_host)/lib64",
           ],
           "libraries": [
             "-lelf",

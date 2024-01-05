@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_SPAWN_H
-#define FRIDANODE_SPAWN_H
+#ifndef TELCONODE_SPAWN_H
+#define TELCONODE_SPAWN_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Spawn : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class Spawn : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  explicit Spawn(FridaSpawn* handle, Runtime* runtime);
+  explicit Spawn(TelcoSpawn* handle, Runtime* runtime);
   ~Spawn();
 
   static NAN_METHOD(New);

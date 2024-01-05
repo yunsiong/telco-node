@@ -202,7 +202,7 @@ class ScriptServices extends SignalAdapter implements RpcController {
 
             this.pendingRequests[id] = complete;
 
-            this.script.post(["frida:rpc", id, operation].concat(params));
+            this.script.post(["telco:rpc", id, operation].concat(params));
             this.signals.connect("destroyed", onScriptDestroyed);
             if (cancellable !== undefined) {
                 cancellable.cancelled.connect(onOperationCancelled);
@@ -320,7 +320,7 @@ function isRpcSendMessage(message: SendMessage): boolean {
         return false;
     }
 
-    return payload[0] === "frida:rpc";
+    return payload[0] === "telco:rpc";
 }
 
 function isLogMessage(message: Message): boolean {

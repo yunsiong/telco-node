@@ -1,4 +1,4 @@
-const frida = require('..');
+const telco = require('..');
 
 const embedScript = `
 const button = {
@@ -23,7 +23,7 @@ console.log('Button after:', JSON.stringify(button));
 const runtime = 'v8';
 
 async function main() {
-  const session = await frida.attach(0);
+  const session = await telco.attach(0);
 
   const snapshot = await session.snapshotScript(embedScript, { warmupScript, runtime });
 

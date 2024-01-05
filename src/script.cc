@@ -20,15 +20,15 @@ using v8::ReadOnly;
 using v8::String;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-Script::Script(FridaScript* handle, Runtime* runtime)
+Script::Script(TelcoScript* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
 
 Script::~Script() {
-  frida_unref(handle_);
+  telco_unref(handle_);
 }
 
 void Script::Init(Local<Object> exports, Runtime* runtime) {
@@ -77,7 +77,7 @@ NAN_METHOD(Script::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaScript*>(
+  auto handle = static_cast<TelcoScript*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new Script(handle, runtime);
   auto obj = info.This();
@@ -86,7 +86,7 @@ NAN_METHOD(Script::New) {
       Signals::New(handle, runtime, TransformMessageSignal, runtime));
 
   auto monitor =
-      new UsageMonitor<FridaScript>(frida_script_is_destroyed, "destroyed");
+      new UsageMonitor<TelcoScript>(telco_script_is_destroyed, "destroyed");
   monitor->Enable(wrapper);
 
   info.GetReturnValue().Set(obj);
@@ -94,22 +94,22 @@ NAN_METHOD(Script::New) {
 
 NAN_PROPERTY_GETTER(Script::IsDestroyed) {
   auto handle = ObjectWrap::Unwrap<Script>(
-      info.Holder())->GetHandle<FridaScript>();
+      info.Holder())->GetHandle<TelcoScript>();
 
   info.GetReturnValue().Set(
-      Nan::New(static_cast<bool>(frida_script_is_destroyed(handle))));
+      Nan::New(static_cast<bool>(telco_script_is_destroyed(handle))));
 }
 
 namespace {
 
-class LoadOperation : public Operation<FridaScript> {
+class LoadOperation : public Operation<TelcoScript> {
  protected:
   void Begin() {
-    frida_script_load(handle_, cancellable_, OnReady, this);
+    telco_script_load(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_script_load_finish(handle_, result, error);
+    telco_script_load_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -131,14 +131,14 @@ NAN_METHOD(Script::Load) {
 
 namespace {
 
-class UnloadOperation : public Operation<FridaScript> {
+class UnloadOperation : public Operation<TelcoScript> {
  protected:
   void Begin() {
-    frida_script_unload(handle_, cancellable_, OnReady, this);
+    telco_script_unload(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_script_unload_finish(handle_, result, error);
+    telco_script_unload_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -160,14 +160,14 @@ NAN_METHOD(Script::Unload) {
 
 namespace {
 
-class EternalizeOperation : public Operation<FridaScript> {
+class EternalizeOperation : public Operation<TelcoScript> {
  protected:
   void Begin() {
-    frida_script_eternalize(handle_, cancellable_, OnReady, this);
+    telco_script_eternalize(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_script_eternalize_finish(handle_, result, error);
+    telco_script_eternalize_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -209,25 +209,25 @@ NAN_METHOD(Script::Post) {
         node::Buffer::Length(buffer));
   }
 
-  frida_script_post(wrapper->GetHandle<FridaScript>(), *message, data);
+  telco_script_post(wrapper->GetHandle<TelcoScript>(), *message, data);
 
   g_bytes_unref(data);
 }
 
 namespace {
 
-class EnableDebuggerOperation : public Operation<FridaScript> {
+class EnableDebuggerOperation : public Operation<TelcoScript> {
  public:
   EnableDebuggerOperation(guint16 port) : port_(port) {
   }
 
  protected:
   void Begin() {
-    frida_script_enable_debugger(handle_, port_, cancellable_, OnReady, this);
+    telco_script_enable_debugger(handle_, port_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_script_enable_debugger_finish(handle_, result, error);
+    telco_script_enable_debugger_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -262,14 +262,14 @@ NAN_METHOD(Script::EnableDebugger) {
 
 namespace {
 
-class DisableDebuggerOperation : public Operation<FridaScript> {
+class DisableDebuggerOperation : public Operation<TelcoScript> {
  protected:
   void Begin() {
-    frida_script_disable_debugger(handle_, cancellable_, OnReady, this);
+    telco_script_disable_debugger(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_script_disable_debugger_finish(handle_, result, error);
+    telco_script_disable_debugger_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {

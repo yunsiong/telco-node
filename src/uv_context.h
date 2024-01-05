@@ -1,12 +1,12 @@
-#ifndef FRIDANODE_UV_CONTEXT_H
-#define FRIDANODE_UV_CONTEXT_H
+#ifndef TELCONODE_UV_CONTEXT_H
+#define TELCONODE_UV_CONTEXT_H
 
 #include <glib.h>
 #include <nan.h>
 
 #include <functional>
 
-namespace frida {
+namespace telco {
 
 class UVContext {
 public:

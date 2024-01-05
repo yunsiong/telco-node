@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_DEVICE_MANAGER_H
-#define FRIDANODE_DEVICE_MANAGER_H
+#ifndef TELCONODE_DEVICE_MANAGER_H
+#define TELCONODE_DEVICE_MANAGER_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class DeviceManager : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class DeviceManager : public GLibObject {
   static void Dispose(Runtime* runtime);
 
  private:
-  DeviceManager(FridaDeviceManager* handle, Runtime* runtime);
+  DeviceManager(TelcoDeviceManager* handle, Runtime* runtime);
   ~DeviceManager();
 
   static NAN_METHOD(New);

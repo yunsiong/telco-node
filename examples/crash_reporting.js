@@ -1,7 +1,7 @@
-const frida = require('..');
+const telco = require('..');
 
 async function main() {
-  const device = await frida.getUsbDevice();
+  const device = await telco.getUsbDevice();
   device.processCrashed.connect(onProcessCrashed);
 
   const session = await device.attach('Hello');

@@ -1,4 +1,4 @@
-import * as frida from "../lib";
+import * as telco from "../lib";
 import { targetProgram } from "./data";
 
 export class LabRat {
@@ -10,10 +10,10 @@ export class LabRat {
     }
 
     static async start(): Promise<LabRat> {
-        const pid = await frida.spawn(targetProgram(), {
-            stdio: frida.Stdio.Pipe
+        const pid = await telco.spawn(targetProgram(), {
+            stdio: telco.Stdio.Pipe
         });
-        await frida.resume(pid);
+        await telco.resume(pid);
         // TODO: improve injectors to handle injection into a process that hasn't yet finished initializing
         await sleep(50);
 
@@ -21,7 +21,7 @@ export class LabRat {
     }
 
     stop(): void {
-        frida.kill(this._pid);
+        telco.kill(this._pid);
     }
 }
 

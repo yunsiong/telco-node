@@ -1,4 +1,4 @@
-import * as frida from "../lib";
+import * as telco from "../lib";
 import { LabRat } from "./labrat";
 
 import { expect } from "chai";
@@ -8,11 +8,11 @@ declare function gc(): void;
 
 describe("Script", function () {
     let target: LabRat;
-    let session: frida.Session;
+    let session: telco.Session;
 
     beforeEach(async () => {
         target = await LabRat.start();
-        session = await frida.attach(target.pid);
+        session = await telco.attach(target.pid);
     });
 
     afterEach(() => {
@@ -120,7 +120,7 @@ describe("Script", function () {
     });
 
     it("should fail rpc request if cancelled mid-request", async () => {
-        const cancellable = new frida.Cancellable();
+        const cancellable = new telco.Cancellable();
 
         const script = await session.createScript(
             "rpc.exports = {" +
@@ -146,7 +146,7 @@ describe("Script", function () {
         const api = await load();
         expect(await api.hello()).to.equal("Is it me you're looking for?");
 
-        async function load(): Promise<frida.ScriptExports> {
+        async function load(): Promise<telco.ScriptExports> {
             const script = await session.createScript(`
             rpc.exports.hello = function () {
                 return "Is it me you're looking for?";

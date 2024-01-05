@@ -1,9 +1,9 @@
-const frida = require('..');
+const telco = require('..');
 
 let deviceManager = null;
 
 async function main() {
-  deviceManager = frida.getDeviceManager();
+  deviceManager = telco.getDeviceManager();
 
   deviceManager.added.connect(onAdded);
   deviceManager.removed.connect(onRemoved);

@@ -1,4 +1,4 @@
-const frida = require('..');
+const telco = require('..');
 
 const processName = process.argv[2];
 
@@ -14,7 +14,7 @@ rpc.exports = {
 `;
 
 async function main() {
-  const session = await frida.attach(processName);
+  const session = await telco.attach(processName);
 
   const script = await session.createScript(source);
   await script.load();

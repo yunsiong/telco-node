@@ -1,9 +1,9 @@
-const frida = require('..');
+const telco = require('..');
 
 let device = null;
 
 async function main() {
-  device = await frida.getLocalDevice();
+  device = await telco.getLocalDevice();
   device.childAdded.connect(onChildAdded);
   device.childRemoved.connect(onChildRemoved);
   device.output.connect(onOutput);

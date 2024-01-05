@@ -17,7 +17,7 @@ using v8::Persistent;
 using v8::ReadOnly;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
 static void UnrefGBytes(char* data, void* hint);
 

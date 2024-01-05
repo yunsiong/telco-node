@@ -1,21 +1,21 @@
-#ifndef FRIDANODE_RELAY_H
-#define FRIDANODE_RELAY_H
+#ifndef TELCONODE_RELAY_H
+#define TELCONODE_RELAY_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Relay : public GLibObject {
  public:
   static void Init(v8::Local<v8::Object> exports, Runtime* runtime);
 
-  static FridaRelay* TryParse(v8::Local<v8::Value> value, Runtime* runtime);
+  static TelcoRelay* TryParse(v8::Local<v8::Value> value, Runtime* runtime);
   static bool HasInstance(v8::Local<v8::Value> value, Runtime* runtime);
 
  private:
-  explicit Relay(FridaRelay* handle, Runtime* runtime);
+  explicit Relay(TelcoRelay* handle, Runtime* runtime);
   ~Relay();
 
   static NAN_METHOD(New);

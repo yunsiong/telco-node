@@ -1,4 +1,4 @@
-const frida = require('..');
+const telco = require('..');
 
 const source = `
 recv(onMessage);
@@ -11,17 +11,17 @@ function onMessage(message) {
 `;
 
 async function spawnExample() {
-  const pid = await frida.spawn(['/bin/cat', '/etc/resolv.conf']);
+  const pid = await telco.spawn(['/bin/cat', '/etc/resolv.conf']);
 
   console.log(`[*] Spawned pid=${pid}`);
 
   // This is where you could attach (see below) and instrument APIs before you call resume()
-  await frida.resume(pid);
+  await telco.resume(pid);
   console.log('[*] Resumed');
 }
 
 async function attachExample() {
-  const session = await frida.attach('cat');
+  const session = await telco.attach('cat');
   console.log('[*] Attached:', session);
   session.detached.connect(onDetached);
 
@@ -52,10 +52,10 @@ async function attachExample() {
 }
 
 async function usbExample() {
-  const device = await frida.getUsbDevice({ timeout: null });
+  const device = await telco.getUsbDevice({ timeout: null });
   console.log('[*] USB device:', device);
 
-  // Now call spawn(), attach(), etc. on `device` just like the above calls on `frida`
+  // Now call spawn(), attach(), etc. on `device` just like the above calls on `telco`
 }
 
 attachExample()

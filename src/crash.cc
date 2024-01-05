@@ -13,9 +13,9 @@ using v8::Persistent;
 using v8::ReadOnly;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-Crash::Crash(FridaCrash* handle, Runtime* runtime)
+Crash::Crash(TelcoCrash* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
@@ -71,7 +71,7 @@ NAN_METHOD(Crash::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaCrash*>(
+  auto handle = static_cast<TelcoCrash*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new Crash(handle, runtime);
   auto obj = info.This();
@@ -82,40 +82,40 @@ NAN_METHOD(Crash::New) {
 
 NAN_PROPERTY_GETTER(Crash::GetPid) {
   auto handle = ObjectWrap::Unwrap<Crash>(
-      info.Holder())->GetHandle<FridaCrash>();
+      info.Holder())->GetHandle<TelcoCrash>();
 
-  info.GetReturnValue().Set(Nan::New<Integer>(frida_crash_get_pid(handle)));
+  info.GetReturnValue().Set(Nan::New<Integer>(telco_crash_get_pid(handle)));
 }
 
 NAN_PROPERTY_GETTER(Crash::GetProcessName) {
   auto handle = ObjectWrap::Unwrap<Crash>(
-      info.Holder())->GetHandle<FridaCrash>();
+      info.Holder())->GetHandle<TelcoCrash>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_crash_get_process_name(handle)).ToLocalChecked());
+      Nan::New(telco_crash_get_process_name(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Crash::GetSummary) {
   auto handle = ObjectWrap::Unwrap<Crash>(
-      info.Holder())->GetHandle<FridaCrash>();
+      info.Holder())->GetHandle<TelcoCrash>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_crash_get_summary(handle)).ToLocalChecked());
+      Nan::New(telco_crash_get_summary(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Crash::GetReport) {
   auto handle = ObjectWrap::Unwrap<Crash>(
-      info.Holder())->GetHandle<FridaCrash>();
+      info.Holder())->GetHandle<TelcoCrash>();
 
   info.GetReturnValue().Set(
-      Nan::New(frida_crash_get_report(handle)).ToLocalChecked());
+      Nan::New(telco_crash_get_report(handle)).ToLocalChecked());
 }
 
 NAN_PROPERTY_GETTER(Crash::GetParameters) {
   auto handle = ObjectWrap::Unwrap<Crash>(
-      info.Holder())->GetHandle<FridaCrash>();
+      info.Holder())->GetHandle<TelcoCrash>();
 
-  GHashTable* parameters = frida_crash_get_parameters(handle);
+  GHashTable* parameters = telco_crash_get_parameters(handle);
   info.GetReturnValue().Set(Runtime::ValueFromParametersDict(parameters));
 }
 

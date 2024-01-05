@@ -1,4 +1,4 @@
-import * as frida from "../lib";
+import * as telco from "../lib";
 
 import { expect } from "chai";
 import "mocha";
@@ -9,13 +9,13 @@ describe("Device", function () {
     afterEach(gc);
 
     it("should have some metadata", async () => {
-        const device = await frida.getLocalDevice();
+        const device = await telco.getLocalDevice();
         expect(device.name).to.equal("Local System");
         expect(device.type).to.equal("local");
     });
 
     it("should enumerate processes", async () => {
-        const device = await frida.getLocalDevice();
+        const device = await telco.getLocalDevice();
 
         const processes = await device.enumerateProcesses();
         expect(processes.length).to.be.above(0);

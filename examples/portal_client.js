@@ -1,4 +1,4 @@
-const frida = require('..');
+const telco = require('..');
 const readline = require('readline');
 const util = require('util');
 
@@ -18,7 +18,7 @@ class Application {
       nick: this._nick,
       secret: 'knock-knock'
     };
-    this._device = await frida.getDeviceManager().addRemoteDevice('::1', {
+    this._device = await telco.getDeviceManager().addRemoteDevice('::1', {
       token: JSON.stringify(token)
     });
 

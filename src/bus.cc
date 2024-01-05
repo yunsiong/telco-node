@@ -17,9 +17,9 @@ using v8::Object;
 using v8::Persistent;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-Bus::Bus(FridaBus* handle, Runtime* runtime)
+Bus::Bus(TelcoBus* handle, Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
@@ -65,7 +65,7 @@ NAN_METHOD(Bus::New) {
 
   auto runtime = GetRuntimeFromConstructorArgs(info);
 
-  auto handle = static_cast<FridaBus*>(
+  auto handle = static_cast<TelcoBus*>(
       Local<External>::Cast(info[0])->Value());
   auto wrapper = new Bus(handle, runtime);
   auto obj = info.This();
@@ -83,14 +83,14 @@ NAN_METHOD(Bus::New) {
 
 namespace {
 
-class AttachOperation : public Operation<FridaBus> {
+class AttachOperation : public Operation<TelcoBus> {
  protected:
   void Begin() {
-    frida_bus_attach(handle_, cancellable_, OnReady, this);
+    telco_bus_attach(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_bus_attach_finish(handle_, result, error);
+    telco_bus_attach_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -132,7 +132,7 @@ NAN_METHOD(Bus::Post) {
         node::Buffer::Length(buffer));
   }
 
-  frida_bus_post(wrapper->GetHandle<FridaBus>(), *message, data);
+  telco_bus_post(wrapper->GetHandle<TelcoBus>(), *message, data);
 
   g_bytes_unref(data);
 }

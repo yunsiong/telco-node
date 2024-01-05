@@ -1,4 +1,4 @@
-const frida = require('..');
+const telco = require('..');
 
 const [ , , processName, processAddress ] = process.argv;
 
@@ -16,7 +16,7 @@ async function main() {
   process.on('SIGTERM', stop);
   process.on('SIGINT', stop);
 
-  const session = await frida.attach(processName);
+  const session = await telco.attach(processName);
   session.detached.connect(onDetached);
 
   script = await session.createScript(source.replace('@ADDRESS@', processAddress));

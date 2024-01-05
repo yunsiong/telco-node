@@ -5,7 +5,7 @@
 #define GLIB_CONTEXT_WAIT()   g_cond_wait(&cond_, &mutex_)
 #define GLIB_CONTEXT_SIGNAL() g_cond_signal(&cond_)
 
-namespace frida {
+namespace telco {
 
 GLibContext::GLibContext(GMainContext* main_context) : main_context_(main_context) {
   g_mutex_init(&mutex_);

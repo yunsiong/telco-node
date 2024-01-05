@@ -19,16 +19,16 @@ using v8::Persistent;
 using v8::ReadOnly;
 using v8::Value;
 
-namespace frida {
+namespace telco {
 
-PortalService::PortalService(FridaPortalService* handle,
+PortalService::PortalService(TelcoPortalService* handle,
     Runtime* runtime)
     : GLibObject(handle, runtime) {
   g_object_ref(handle_);
 }
 
 PortalService::~PortalService() {
-  frida_unref(handle_);
+  telco_unref(handle_);
 }
 
 void PortalService::Init(Local<Object> exports, Runtime* runtime) {
@@ -69,8 +69,8 @@ NAN_METHOD(PortalService::New) {
   auto cluster_params_value = info[0];
   auto control_params_value = info[1];
 
-  FridaEndpointParameters* cluster_params = NULL;
-  FridaEndpointParameters* control_params = NULL;
+  TelcoEndpointParameters* cluster_params = NULL;
+  TelcoEndpointParameters* control_params = NULL;
   bool valid = true;
 
   if (!cluster_params_value->IsNull()) {
@@ -84,7 +84,7 @@ NAN_METHOD(PortalService::New) {
     }
   } else {
     cluster_params =
-        frida_endpoint_parameters_new(NULL, 0, NULL, NULL, NULL, NULL);
+        telco_endpoint_parameters_new(NULL, 0, NULL, NULL, NULL, NULL);
   }
 
   if (valid && !control_params_value->IsNull()) {
@@ -99,7 +99,7 @@ NAN_METHOD(PortalService::New) {
   }
 
   if (valid) {
-    auto handle = frida_portal_service_new(cluster_params, control_params);
+    auto handle = telco_portal_service_new(cluster_params, control_params);
     auto wrapper = new PortalService(handle, runtime);
     g_object_unref(handle);
     auto obj = info.This();
@@ -116,22 +116,22 @@ NAN_METHOD(PortalService::New) {
 
 NAN_PROPERTY_GETTER(PortalService::GetDevice) {
   auto wrapper = ObjectWrap::Unwrap<PortalService>(info.Holder());
-  auto handle = wrapper->GetHandle<FridaPortalService>();
+  auto handle = wrapper->GetHandle<TelcoPortalService>();
 
   info.GetReturnValue().Set(
-      Device::New(frida_portal_service_get_device(handle), wrapper->runtime_));
+      Device::New(telco_portal_service_get_device(handle), wrapper->runtime_));
 }
 
 namespace {
 
-class StartOperation : public Operation<FridaPortalService> {
+class StartOperation : public Operation<TelcoPortalService> {
  protected:
   void Begin() {
-    frida_portal_service_start(handle_, cancellable_, OnReady, this);
+    telco_portal_service_start(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_portal_service_start_finish(handle_, result, error);
+    telco_portal_service_start_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -154,14 +154,14 @@ NAN_METHOD(PortalService::Start) {
 
 namespace {
 
-class StopOperation : public Operation<FridaPortalService> {
+class StopOperation : public Operation<TelcoPortalService> {
  protected:
   void Begin() {
-    frida_portal_service_stop(handle_, cancellable_, OnReady, this);
+    telco_portal_service_stop(handle_, cancellable_, OnReady, this);
   }
 
   void End(GAsyncResult* result, GError** error) {
-    frida_portal_service_stop_finish(handle_, result, error);
+    telco_portal_service_stop_finish(handle_, result, error);
   }
 
   Local<Value> Result(Isolate* isolate) {
@@ -208,7 +208,7 @@ NAN_METHOD(PortalService::Post) {
         node::Buffer::Length(buffer));
   }
 
-  frida_portal_service_post(wrapper->GetHandle<FridaPortalService>(),
+  telco_portal_service_post(wrapper->GetHandle<TelcoPortalService>(),
       connection_id, *message, data);
 
   g_bytes_unref(data);
@@ -238,7 +238,7 @@ NAN_METHOD(PortalService::Narrowcast) {
         node::Buffer::Length(buffer));
   }
 
-  frida_portal_service_narrowcast(wrapper->GetHandle<FridaPortalService>(),
+  telco_portal_service_narrowcast(wrapper->GetHandle<TelcoPortalService>(),
       *tag, *message, data);
 
   g_bytes_unref(data);
@@ -266,7 +266,7 @@ NAN_METHOD(PortalService::Broadcast) {
         node::Buffer::Length(buffer));
   }
 
-  frida_portal_service_broadcast(wrapper->GetHandle<FridaPortalService>(),
+  telco_portal_service_broadcast(wrapper->GetHandle<TelcoPortalService>(),
       *message, data);
 
   g_bytes_unref(data);
@@ -274,7 +274,7 @@ NAN_METHOD(PortalService::Broadcast) {
 
 namespace {
 
-class EnumerateTagsOperation : public Operation<FridaPortalService> {
+class EnumerateTagsOperation : public Operation<TelcoPortalService> {
  public:
   EnumerateTagsOperation(guint connection_id)
     : connection_id_(connection_id),
@@ -288,7 +288,7 @@ class EnumerateTagsOperation : public Operation<FridaPortalService> {
 
  protected:
   void Begin() {
-    tags_ = frida_portal_service_enumerate_tags(handle_, connection_id_, &n_);
+    tags_ = telco_portal_service_enumerate_tags(handle_, connection_id_, &n_);
     OnReady(G_OBJECT(handle_), NULL, this);
   }
 
@@ -341,7 +341,7 @@ NAN_METHOD(PortalService::Tag) {
 
   Nan::Utf8String tag(info[1]);
 
-  frida_portal_service_tag(wrapper->GetHandle<FridaPortalService>(),
+  telco_portal_service_tag(wrapper->GetHandle<TelcoPortalService>(),
       connection_id, *tag);
 }
 
@@ -360,7 +360,7 @@ NAN_METHOD(PortalService::Untag) {
 
   Nan::Utf8String tag(info[1]);
 
-  frida_portal_service_untag(wrapper->GetHandle<FridaPortalService>(),
+  telco_portal_service_untag(wrapper->GetHandle<TelcoPortalService>(),
       connection_id, *tag);
 }
 

@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_BUS_H
-#define FRIDANODE_BUS_H
+#ifndef TELCONODE_BUS_H
+#define TELCONODE_BUS_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Bus : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class Bus : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  explicit Bus(FridaBus* handle, Runtime* runtime);
+  explicit Bus(TelcoBus* handle, Runtime* runtime);
   ~Bus();
 
   static NAN_METHOD(New);

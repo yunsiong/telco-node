@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_IOSTREAM_H
-#define FRIDANODE_IOSTREAM_H
+#ifndef TELCONODE_IOSTREAM_H
+#define TELCONODE_IOSTREAM_H
 
 #include "glib_object.h"
 
 #include <gio/gio.h>
 
-namespace frida {
+namespace telco {
 
 class IOStream : public GLibObject {
  public:

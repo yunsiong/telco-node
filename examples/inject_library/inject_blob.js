@@ -6,7 +6,7 @@
  * $ node inject_blob.js Twitter example.dylib
  */
 
-const frida = require('../..');
+const telco = require('../..');
 const fs = require('fs');
 const { promisify } = require('util');
 
@@ -19,7 +19,7 @@ let device = null;
 async function main() {
   const libraryBlob = await readFile(libraryPath);
 
-  device = await frida.getLocalDevice();
+  device = await telco.getLocalDevice();
   device.uninjected.connect(onUninjected);
 
   try {

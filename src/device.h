@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_DEVICE_H
-#define FRIDANODE_DEVICE_H
+#ifndef TELCONODE_DEVICE_H
+#define TELCONODE_DEVICE_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Device : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class Device : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  Device(FridaDevice* handle, Runtime* runtime);
+  Device(TelcoDevice* handle, Runtime* runtime);
   ~Device();
 
   static NAN_METHOD(New);

@@ -1,4 +1,4 @@
-const frida = require('..');
+const telco = require('..');
 
 const processName = process.argv[2];
 
@@ -7,7 +7,7 @@ send({ pid: Process.id, arch: Process.arch });
 `;
 
 async function main() {
-  const device = await frida.getUsbDevice();
+  const device = await telco.getUsbDevice();
   await probeRealm(device, processName, 'native');
   await probeRealm(device, processName, 'emulated');
 }

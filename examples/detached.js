@@ -1,9 +1,9 @@
-const frida = require('..');
+const telco = require('..');
 
 async function main() {
   process.stdin.pause();
 
-  const device = await frida.getUsbDevice();
+  const device = await telco.getUsbDevice();
   const session = await device.attach('Hello');
   session.detached.connect(onDetached);
 

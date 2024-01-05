@@ -1,4 +1,4 @@
-const frida = require('..');
+const telco = require('..');
 
 const processName = process.argv[2];
 
@@ -9,7 +9,7 @@ recv('poke', function onMessage(pokeMessage) {
 `;
 
 async function main() {
-  const session = await frida.attach(processName);
+  const session = await telco.attach(processName);
 
   const script = await session.createScript(source);
   script.message.connect(message => {

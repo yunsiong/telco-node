@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_CANCELLABLE_H
-#define FRIDANODE_CANCELLABLE_H
+#ifndef TELCONODE_CANCELLABLE_H
+#define TELCONODE_CANCELLABLE_H
 
 #include "glib_object.h"
 
 #include <gio/gio.h>
 
-namespace frida {
+namespace telco {
 
 class Cancellable : public GLibObject {
  public:

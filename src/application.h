@@ -1,11 +1,11 @@
-#ifndef FRIDANODE_APPLICATION_H
-#define FRIDANODE_APPLICATION_H
+#ifndef TELCONODE_APPLICATION_H
+#define TELCONODE_APPLICATION_H
 
 #include "glib_object.h"
 
-#include <frida-core.h>
+#include <telco-core.h>
 
-namespace frida {
+namespace telco {
 
 class Application : public GLibObject {
  public:
@@ -13,7 +13,7 @@ class Application : public GLibObject {
   static v8::Local<v8::Object> New(gpointer handle, Runtime* runtime);
 
  private:
-  explicit Application(FridaApplication* handle, Runtime* runtime);
+  explicit Application(TelcoApplication* handle, Runtime* runtime);
   ~Application();
 
   static NAN_METHOD(New);
