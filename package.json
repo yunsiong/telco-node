@@ -58,9 +58,9 @@
   "license": "LGPL-2.0 WITH WxWindows-exception-3.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/telco/telco-node.git"
+    "url": "https://github.com/yunsiong/telco-node.git"
   },
   "bugs": {
-    "url": "https://github.com/telco/telco-node/issues"
+    "url": "https://github.com/yunsiong/telco-node/issues"
   }
 }
